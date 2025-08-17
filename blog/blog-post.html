@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- When a user clicks "Read More" on an article, they will be taken to this page. 
+It's designed for readability with a clean, single-column layout for the article content and includes a "Related Posts" 
+section to keep visitors engaged. -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Brains Behind the Bloom: How IoT is Revolutionizing Our Mushroom Farm - MYCOgenesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for prose content for better readability */
+        .prose h2 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .prose p {
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+        }
+        .prose ul {
+            list-style-position: inside;
+            list-style-type: disc;
+            margin-bottom: 1.25rem;
+        }
+        .prose li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+       <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="images/logo/MYCOgenesis.svg" alt="MYCOgenesis Logo" class="h-12 w-12 mr-3">
+                <span class="font-bold text-xl text-slate-700">MYCOGenesis</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="index.html#home" class="text-slate-600 hover:text-teal-600">Home</a>
+                <a href="index.html#about" class="text-slate-600 hover:text-teal-600">About Us</a>
+                <a href="index.html#mushrooms" class="text-slate-600 hover:text-teal-600">Our Mushrooms</a>
+                <a href="index.html#smart-farm" class="text-slate-600 hover:text-teal-600">Smart Farm</a>
+                <a href="index.html#shop" class="text-slate-600 hover:text-teal-600">Shop</a>
+                <a href="blog.html" class="text-teal-600 font-bold">Blog</a>
+                <a href="index.html#contact" class="text-slate-600 hover:text-teal-600">Contact</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-slate-600 hover:text-teal-600 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95">
+            </div>
+    </header>
+
+    <main>
+        <article class="py-20">
+            <div class="container mx-auto px-6 max-w-3xl">
+                <header class="mb-12 text-center">
+                    <span class="text-sm font-semibold text-teal-600 uppercase">Tech Insights</span>
+                    <h1 class="text-4xl md:text-5xl font-bold mt-2 mb-4">The Brains Behind the Bloom: How IoT is Revolutionizing Our Mushroom Farm</h1>
+                    <p class="text-slate-500">By <span class="font-semibold text-slate-700">Jane Doe</span> • Published on August 15, 2025</p>
+                </header>
+                
+                <img src="https://images.unsplash.com/photo-1616597082843-a72175a3de38?q=80&w=1200&auto=format&fit=crop" alt="Mushroom farm with technology integration" class="w-full h-auto rounded-lg shadow-lg mb-12">
+
+                <div class="prose max-w-none text-slate-700">
+                    <p>Mushroom cultivation has traditionally been a delicate dance between art and science, heavily reliant on the grower's intuition. But what if we could replace intuition with precision? At MYCOgenesis, we're doing just that by integrating a sophisticated Internet of Things (IoT) ecosystem into the heart of our farm. This isn't just about modernization; it's about creating the absolute perfect environment for our fungi to flourish.</p>
+                    
+                    <h2>The Core: Our Sensor Network</h2>
+                    <p>The foundation of our smart farm is a network of high-precision sensors deployed throughout our growing rooms. These aren't just simple thermometers; they are a comprehensive suite of tools that act as our eyes and ears:</p>
+                    <ul>
+                        <li><strong>Temperature & Humidity Sensors:</strong> These maintain the precise moisture and warmth that mimic a mushroom's natural habitat.</li>
+                        <li><strong>CO₂ Sensors:</strong> Mushrooms "exhale" CO₂. High levels can stunt growth. Our sensors trigger ventilation systems to introduce fresh air exactly when needed.</li>
+                        <li><strong>Substrate Moisture Probes:</strong> We monitor moisture levels directly within the growing medium, ensuring the mycelium network has the hydration it needs for robust growth without the risk of waterlogging.</li>
+                        <li><strong>Light Sensors:</strong> While many mushrooms grow in the dark, specific light wavelengths and durations can trigger pinning (the start of a mushroom fruit body). Our system controls this with precision.</li>
+                    </ul>
+
+                    <h2>The Brain: Cloud Data and AI</h2>
+                    <p>All data from our ESP32 and ESP8266 microcontrollers is streamed in real-time to a Firebase cloud database. This is where the magic happens. Our AI and machine learning models analyze this continuous flow of information to:</p>
+                    <ul>
+                        <li><strong>Predict Growth Cycles:</strong> By learning from past data, our AI can predict optimal harvest times with remarkable accuracy.</li>
+                        <li><strong>Detect Anomalies:</strong> The system can identify subtle environmental shifts that could signal a problem—like potential contamination or equipment malfunction—long before a human could spot it.</li>
+                        <li><strong>Automate Actuators:</strong> The AI doesn't just monitor; it acts. It automatically controls fans, misters, heaters, and LED lights to maintain the set-point parameters for each specific mushroom variety, 24/7.</li>
+                    </ul>
+                    <p>By blending nature's blueprint with cutting-edge technology, we ensure every single mushroom we produce is of consistent, premium quality. It's a system that reduces waste, maximizes yield, and allows us to cultivate tomorrow's flavors, today.</p>
+                </div>
+            </div>
+        </article>
+
+        <section class="py-20 bg-stone-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-12">You Might Also Like</h2>
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
+                        <a href="#" class="block">
+                            <img src="https://images.unsplash.com/photo-1596702652410-912a20a41d5a?q=80&w=600&auto=format&fit=crop" alt="Agricultural waste like sawdust and wood chips" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="font-bold text-lg mb-2">Waste Not, Want Not: Our Commitment to a Circular Economy</h3>
+                                <p class="text-slate-600 text-sm">Learn how our substrate is made from agricultural byproducts.</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
+                        <a href="#" class="block">
+                            <img src="images/Featured_varieties/oyster_mashroon.png" alt="Oyster Mushrooms" class="w-full h-48 object-cover">
+                            <div class="p-6">
+                                <h3 class="font-bold text-lg mb-2">A Deep Dive into Oyster Mushroom Cultivation</h3>
+                                <p class="text-slate-600 text-sm">The specific environmental needs for one of our favorite varieties.</p>
+                            </div>
+                        </a>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
+                        <a href="#" class="block">
+                           <img src="https://images.unsplash.com/photo-1604313324216-a7c751e7dd1e?q=80&w=600&auto=format&fit=crop" alt="Lion's Mane Mushroom close-up" class="w-full h-48 object-cover">
+                           <div class="p-6">
+                               <h3 class="font-bold text-lg mb-2">Unlocking the Power of Lion's Mane</h3>
+                               <p class="text-slate-600 text-sm">Exploring the health benefits of this incredible functional mushroom.</p>
+                           </div>
+                       </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-stone-300 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 MYCOgenesis. All Rights Reserved.</p>
+            <div class="flex justify-center space-x-6 mt-4">
+                <a href="#" class="hover:text-teal-400">Facebook</a>
+                <a href="#" class="hover:text-teal-400">Instagram</a>
+                <a href="#" class="hover:text-teal-400">Twitter</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu script from your homepage
+        document.getElementById('mobile-menu-button').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
