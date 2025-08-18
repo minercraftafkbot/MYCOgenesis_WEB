@@ -7,48 +7,105 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/index.css">
+    <style>
+        @media (max-width: 1024px) {
+            #mobile-menu {
+                transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+            }
+            #mobile-menu.hidden {
+                opacity: 0;
+                transform: translateY(-1rem);
+            }
+            #mobile-menu {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .shadow-top {
+            box-shadow: 0 -1px 3px 0 rgb(0 0 0 / 0.1), 0 -1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        @media (min-width: 1024px) {
+            .nav-item-hover {
+                position: relative;
+                transition: all 0.2s ease-in-out;
+            }
+            .nav-item-hover::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -2px;
+                left: 50%;
+                background-color: #0d9488;
+                transition: all 0.2s ease-in-out;
+                transform: translateX(-50%);
+            }
+            .nav-item-hover:hover::after {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body class="bg-stone-50 text-slate-800">
 
     <!-- Header & Navigation -->
-    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
             <div class="flex items-center">
-                <img src="images/logo/MYCOgenesis.svg"  alt=" MYCOgenesis Logo" class="h-12 w-12 mr-3">
-                <span class="font-bold text-xl text-slate-700">MYCOGenesis</span>
+                <img src="images/logo/MYCOgenesis.svg" alt="MYCOgenesis Logo" class="h-10 w-10 sm:h-12 sm:w-12 mr-2 sm:mr-3">
+                <span class="font-bold text-lg sm:text-xl text-slate-700">MYCOGenesis</span>
             </div>
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="#home" class="text-slate-600 hover:text-teal-600">Home</a>
-                <a href="#about" class="text-slate-600 hover:text-teal-600">About Us</a>
-                <a href="#mushrooms" class="text-slate-600 hover:text-teal-600">Our Mushrooms</a>
-                <a href="#smart-farm" class="text-slate-600 hover:text-teal-600">Smart Farm</a>
-                <a href="#shop" class="text-slate-600 hover:text-teal-600">Shop</a>
-                <a href="#blog" class="text-slate-600 hover:text-teal-600">Blog</a>
-                <a href="#contact" class="text-slate-600 hover:text-teal-600">Contact</a>
-                <div class="flex items-center space-x-4 ml-4 border-0 pl-14">
-                    <a href="auth/login.html" class="text-slate-600 hover:text-teal-600">Login</a>
-                    <a href="auth/signup.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition duration-300">Sign Up</a>
-                </div>
+            <div class="hidden lg:flex items-center space-x-2 xl:space-x-6">
+                <a href="#home" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Home</a>
+                <a href="#about" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">About Us</a>
+                <a href="#mushrooms" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Our Mushrooms</a>
+                <a href="#smart-farm" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Smart Farm</a>
+                <a href="#shop" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Shop</a>
+                <a href="#blog" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Blog</a>
+                <a href="#contact" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Contact</a>
             </div>
+            <div class="hidden lg:flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
+                <a href="auth/login.html" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Login</a>
+                <a href="auth/signup.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-md">Sign Up</a>
+            </div>
+            <!-- Tablet Navigation -->
+            <div class="hidden md:flex lg:hidden items-center space-x-2">
+                <a href="#" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </a>
+                <a href="auth/login.html" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
             <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-slate-600 hover:text-teal-600 focus:outline-none">
+                <button id="mobile-menu-button" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200 focus:outline-none">
                     <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
                         <path d="M4 6h16M4 12h16m-7 6h7"></path>
                     </svg>
                 </button>
             </div>
         </nav>
-        <div id="mobile-menu" class="hidden md:hidden bg-white/95">
-            <a href="#home" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Home</a>
-            <a href="#about" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">About Us</a>
-            <a href="#mushrooms" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Our Mushrooms</a>
-            <a href="#smart-farm" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Smart Farm</a>
-            <a href="#shop" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Shop</a>
-            <a href="#blog" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Blog</a>
-            <a href="#contact" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Contact</a>
-            <div class="border-t mt-2 pt-2">
-                <a href="auth/login.html" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Login</a>
-                <a href="auth/signup.html" class="block py-2 px-4 text-sm text-white bg-teal-600 hover:bg-teal-700">Sign Up</a>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 border-b border-slate-100 transition-all duration-300 ease-in-out">
+            <div class="px-4 pt-2 pb-3 space-y-1">
+                <a href="#home" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Home</a>
+                <a href="#about" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">About Us</a>
+                <a href="#mushrooms" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Our Mushrooms</a>
+                <a href="#smart-farm" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Smart Farm</a>
+                <a href="#shop" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Shop</a>
+                <a href="#blog" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Blog</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Contact</a>
+            </div>
+            <div class="px-4 py-3 border-t border-slate-200 space-y-2">
+                <a href="auth/login.html" class="block w-full px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Login</a>
+                <a href="auth/signup.html" class="block w-full px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md text-center transition-all duration-200">Sign Up</a>
             </div>
         </div>
     </header>
@@ -301,26 +358,88 @@
     </footer>
 
     <script>
-        // Mobile menu toggle
+        // Mobile menu toggle with animation and scroll lock
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
+        const header = document.querySelector('header');
+        let isMenuOpen = false;
 
-        mobileMenuButton.addEventListener('click', () => {
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
             mobileMenu.classList.toggle('hidden');
+            
+            // Toggle body scroll
+            document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+            
+            // Update button aria attributes
+            mobileMenuButton.setAttribute('aria-expanded', isMenuOpen);
+            
+            // Add animation classes
+            if (isMenuOpen) {
+                mobileMenu.classList.add('opacity-100');
+                mobileMenu.classList.remove('opacity-0');
+                header.classList.add('shadow-lg');
+            } else {
+                mobileMenu.classList.add('opacity-0');
+                mobileMenu.classList.remove('opacity-100');
+                header.classList.remove('shadow-lg');
+            }
+        }
+
+        mobileMenuButton.addEventListener('click', toggleMenu);
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (isMenuOpen && !header.contains(e.target)) {
+                toggleMenu();
+            }
         });
 
-        // Smooth scrolling for anchor links
+        // Add active state to navigation items
+        function updateActiveNavItem() {
+            const sections = document.querySelectorAll('section[id]');
+            const navItems = document.querySelectorAll('a[href^="#"]');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - sectionHeight/3)) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('text-teal-600', 'bg-teal-50/50');
+                const href = item.getAttribute('href').substring(1);
+                if (href === currentSection) {
+                    item.classList.add('text-teal-600', 'bg-teal-50/50');
+                }
+            });
+        }
+
+        // Smooth scrolling for anchor links with active state update
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
+                if (isMenuOpen) {
+                    toggleMenu();
                 }
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
+
+        // Update active state on scroll
+        window.addEventListener('scroll', updateActiveNavItem);
+        window.addEventListener('load', updateActiveNavItem);
 
         // Hero background image rotation
         const heroBackgrounds = document.querySelectorAll('.hero-bg-image');
