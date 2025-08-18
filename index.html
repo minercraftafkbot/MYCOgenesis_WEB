@@ -6,35 +6,7 @@
     <title>MYCOgenesis - Cultivating Tomorrow's Flavors, Today</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .hero-bg {
-            position: relative;
-            overflow: hidden;
-        }
-        .hero-bg-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-        }
-        .hero-bg-image.active {
-            opacity: 1;
-        }
-        .transition-transform {
-            transition: transform 0.3s ease-in-out;
-        }
-        .hover\:scale-105:hover {
-            transform: scale(1.05);
-        }
-    </style>
+    <link rel="stylesheet" href="css/index.css">
 </head>
 <body class="bg-stone-50 text-slate-800">
 
@@ -53,6 +25,10 @@
                 <a href="#shop" class="text-slate-600 hover:text-teal-600">Shop</a>
                 <a href="#blog" class="text-slate-600 hover:text-teal-600">Blog</a>
                 <a href="#contact" class="text-slate-600 hover:text-teal-600">Contact</a>
+                <div class="flex items-center space-x-4 ml-4 border-0 pl-14">
+                    <a href="auth/login.html" class="text-slate-600 hover:text-teal-600">Login</a>
+                    <a href="auth/signup.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg transition duration-300">Sign Up</a>
+                </div>
             </div>
             <div class="md:hidden">
                 <button id="mobile-menu-button" class="text-slate-600 hover:text-teal-600 focus:outline-none">
@@ -70,6 +46,10 @@
             <a href="#shop" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Shop</a>
             <a href="#blog" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Blog</a>
             <a href="#contact" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Contact</a>
+            <div class="border-t mt-2 pt-2">
+                <a href="auth/login.html" class="block py-2 px-4 text-sm text-slate-600 hover:bg-teal-50">Login</a>
+                <a href="auth/signup.html" class="block py-2 px-4 text-sm text-white bg-teal-600 hover:bg-teal-700">Sign Up</a>
+            </div>
         </div>
     </header>
 
@@ -79,13 +59,13 @@
             <div class="hero-bg-image" style="background-image: url('images/hero_section/Gemini_Generated_Image_64xcrz64xcrz64xc.png');"></div>
             <div class="hero-bg-image" style="background-image: url('images/hero_section/Gemini_Generated_Image_iybqagiybqagiybq.png');"></div>
             <div class="hero-bg-image" style="background-image: url('images/hero_section/Gemini_Generated_Image_ynjdvcynjdvcynjd.png');"></div>
-            <div class="bg-black/60 min-h-[70vh] flex items-center relative z-10">
-                <div class="container mx-auto px-6 text-center">
-                    <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Cultivating Tomorrow's Flavors, Today</h1>
-                    <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">Harnessing nature's intelligence and modern technology for superior quality, sustainable, and diverse mushroom varieties.</p>
-                    <div class="space-x-4">
-                        <a href="#mushrooms" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">Explore Our Mushrooms</a>
-                        <a href="#smart-farm" class="bg-stone-200 hover:bg-stone-300 text-slate-800 font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">Our Technology</a>
+            <div class="bg-black/60 min-h-[60vh] md:min-h-[70vh] flex items-center relative z-10">
+                <div class="container mx-auto px-4 md:px-6 py-8 md:py-12 text-center">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight hero-title">Cultivating Tomorrow's Flavors, Today</h1>
+                    <p class="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto hero-description">Harnessing nature's intelligence and modern technology for superior quality, sustainable, and diverse mushroom varieties.</p>
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
+                        <a href="#mushrooms" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-center">Explore Our Mushrooms</a>
+                        <a href="#smart-farm" class="w-full sm:w-auto bg-stone-200 hover:bg-stone-300 text-slate-800 font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-center">Our Technology</a>
                     </div>
                 </div>
             </div>
