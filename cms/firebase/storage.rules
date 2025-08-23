@@ -1,0 +1,122 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper functions - Optimized for Firebase v10.13.2
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function getUserRole() {
+      return isAuthenticated() ? getUserData().role : null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    function isEditor() {
+      return isAuthenticated() && getUserRole() in ['admin', 'editor'];
+    }
+    
+    function isActiveUser() {
+      return isAuthenticated() && getUserData().status == 'active';
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 10 * 1024 * 1024 && // 10MB limit
+             request.resource.contentType in [
+               'image/jpeg', 'image/png', 'image/gif', 
+               'image/webp', 'image/svg+xml'
+             ];
+    }
+    
+    function isValidDocumentFile() {
+      return request.resource.contentType in [
+               'application/pdf',
+               'text/plain',
+               'text/markdown',
+               'application/msword',
+               'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+             ] &&
+             request.resource.size < 50 * 1024 * 1024; // 50MB limit
+    }
+    
+    function isValidFileName(fileName) {
+      return fileName.matches('[a-zA-Z0-9._-]+') && 
+             fileName.size() < 100; // Max filename length
+    }
+
+    // Blog images
+    match /images/blog/{blogId}/{imageId} {
+      // Anyone can read published blog images
+      allow read: if true;
+      
+      // Editors+ can upload blog images
+      allow write: if isEditor() && isActiveUser() && isValidImageFile();
+      
+      // Only admins can delete blog images
+      allow delete: if isAdmin() && isActiveUser();
+    }
+
+    // Product images
+    match /images/products/{productId}/{imageId} {
+      // Anyone can read product images
+      allow read: if true;
+      
+      // Only admins can manage product images
+      allow write, delete: if isAdmin() && isActiveUser() && isValidImageFile();
+    }
+
+    // User avatars
+    match /images/users/{userId}/{imageId} {
+      // Users can read their own avatar, others can read if public
+      allow read: if true;
+      
+      // Users can upload their own avatar
+      allow write: if isAuthenticated() && 
+                      isActiveUser() && 
+                      request.auth.uid == userId && 
+                      isValidImageFile();
+      
+      // Users can delete their own avatar, admins can delete any
+      allow delete: if isActiveUser() && 
+                       (request.auth.uid == userId || isAdmin());
+    }
+
+    // General uploads (for rich text editor, etc.) - Enhanced for Firebase v10
+    match /uploads/{userId}/{fileName} {
+      // Authenticated users can read uploads
+      allow read: if isAuthenticated();
+      
+      // Editors+ can upload files with validation
+      allow write: if isEditor() && 
+                      isActiveUser() && 
+                      request.auth.uid == userId &&
+                      isValidFileName(fileName) &&
+                      (isValidImageFile() || isValidDocumentFile());
+      
+      // Users can delete their own uploads, admins can delete any
+      allow delete: if isActiveUser() && 
+                       (request.auth.uid == userId || isAdmin());
+    }
+    
+    // Temporary uploads (for processing)
+    match /temp/{userId}/{fileName} {
+      // Users can upload temporary files (auto-deleted after 24h)
+      allow read, write: if isAuthenticated() && 
+                            isActiveUser() && 
+                            request.auth.uid == userId &&
+                            isValidFileName(fileName) &&
+                            (isValidImageFile() || isValidDocumentFile());
+      
+      // Users can delete their own temp files, admins can delete any
+      allow delete: if isActiveUser() && 
+                       (request.auth.uid == userId || isAdmin());
+    }
+  }
+}
