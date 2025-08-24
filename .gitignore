@@ -67,3 +67,4 @@ credentials/
 *.tmp
 *.temp
 .temp/
+.vercel
