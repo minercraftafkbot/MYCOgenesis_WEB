@@ -449,6 +449,19 @@ class SharedAuthHandler {
             profile: this.userProfile
         } : null;
     }
+
+    /**
+     * Refresh user profile from Firestore (useful after role changes)
+     * @returns {Promise<void>}
+     */
+    async refreshUserProfile() {
+        if (this.currentUser) {
+            console.log('🔄 Refreshing user profile from Firestore...');
+            await this.loadUserProfile(this.currentUser.uid);
+            this.updateUserDisplay();
+            console.log('✅ User profile refreshed:', this.userProfile);
+        }
+    }
 }
 
 // Export for use in other modules
