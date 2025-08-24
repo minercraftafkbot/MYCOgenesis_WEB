@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment Variables Test - MYCOgenesis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-ok { color: #10b981; }
+        .status-error { color: #ef4444; }
+        .status-warning { color: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-800">🔧 Environment Variables Test</h1>
+        
+        <!-- Environment Loader Status -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Environment Loader Status</h2>
+            <div id="loader-status" class="space-y-2">
+                <div>Loading environment configuration...</div>
+            </div>
+        </div>
+
+        <!-- Firebase Configuration -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Firebase Configuration</h2>
+            <div id="firebase-config" class="space-y-2">
+                <div>Loading Firebase configuration...</div>
+            </div>
+        </div>
+
+        <!-- Sanity Configuration -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Sanity CMS Configuration</h2>
+            <div id="sanity-config" class="space-y-2">
+                <div>Loading Sanity configuration...</div>
+            </div>
+        </div>
+
+        <!-- Application Settings -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Application Settings</h2>
+            <div id="app-settings" class="space-y-2">
+                <div>Loading application settings...</div>
+            </div>
+        </div>
+
+        <!-- Debug Information -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Information</h2>
+            <div id="debug-info" class="space-y-2">
+                <div>Loading debug information...</div>
+            </div>
+        </div>
+
+        <!-- Test Actions -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Test Actions</h2>
+            <div class="space-x-4">
+                <button id="test-firebase" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Test Firebase Connection
+                </button>
+                <button id="reload-config" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Reload Configuration
+                </button>
+                <button id="validate-config" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Validate Configuration
+                </button>
+            </div>
+            <div id="test-results" class="mt-4 p-4 bg-gray-100 rounded min-h-12">
+                <div class="text-gray-500">Test results will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import environmentLoader from './js/utils/environment-loader.js';
+
+        // Display functions
+        function displayLoaderStatus() {
+            const container = document.getElementById('loader-status');
+            const status = environmentLoader.isLoaded;
+            
+            container.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="${status ? 'status-ok' : 'status-error'}">●</span>
+                    <span>Environment Loader: ${status ? 'Loaded' : 'Not Loaded'}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="status-ok">●</span>
+                    <span>Environment: ${environmentLoader.get('ENVIRONMENT', 'unknown')}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="${environmentLoader.isDebugMode() ? 'status-warning' : 'status-ok'}">●</span>
+                    <span>Debug Mode: ${environmentLoader.isDebugMode() ? 'Enabled' : 'Disabled'}</span>
+                </div>
+            `;
+        }
+
+        function displayFirebaseConfig() {
+            const container = document.getElementById('firebase-config');
+            try {
+                const config = environmentLoader.getFirebaseConfig();
+                const hasRequiredFields = config.apiKey && config.projectId && config.authDomain;
+                
+                container.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="${hasRequiredFields ? 'status-ok' : 'status-error'}">●</span>
+                        <span>Configuration Status: ${hasRequiredFields ? 'Valid' : 'Invalid'}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-4 text-sm">
+                        <div><strong>Project ID:</strong> ${config.projectId || 'Not Set'}</div>
+                        <div><strong>Auth Domain:</strong> ${config.authDomain || 'Not Set'}</div>
+                        <div><strong>API Key:</strong> ${config.apiKey ? config.apiKey.substring(0, 8) + '...' : 'Not Set'}</div>
+                        <div><strong>Storage Bucket:</strong> ${config.storageBucket || 'Not Set'}</div>
+                        <div><strong>Database URL:</strong> ${config.databaseURL ? '✓ Set' : 'Not Set'}</div>
+                        <div><strong>Analytics ID:</strong> ${config.measurementId || 'Not Set'}</div>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-2 status-error">
+                        <span>●</span>
+                        <span>Error loading Firebase config: ${error.message}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function displaySanityConfig() {
+            const container = document.getElementById('sanity-config');
+            try {
+                const config = environmentLoader.getSanityConfig();
+                const hasProjectId = config.projectId && config.projectId !== 'your-sanity-project-id';
+                
+                container.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="${hasProjectId ? 'status-ok' : 'status-warning'}">●</span>
+                        <span>Configuration Status: ${hasProjectId ? 'Configured' : 'Default/Not Configured'}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-4 text-sm">
+                        <div><strong>Project ID:</strong> ${config.projectId}</div>
+                        <div><strong>Dataset:</strong> ${config.dataset}</div>
+                        <div><strong>API Version:</strong> ${config.apiVersion}</div>
+                        <div><strong>Use CDN:</strong> ${config.useCdn ? 'Yes' : 'No'}</div>
+                    </div>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-2 status-error">
+                        <span>●</span>
+                        <span>Error loading Sanity config: ${error.message}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function displayAppSettings() {
+            const container = document.getElementById('app-settings');
+            
+            container.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div><strong>App Name:</strong> ${environmentLoader.get('APP_NAME', 'Not Set')}</div>
+                    <div><strong>App URL:</strong> ${environmentLoader.get('APP_URL', 'Not Set')}</div>
+                    <div><strong>Environment:</strong> ${environmentLoader.get('ENVIRONMENT', 'Not Set')}</div>
+                    <div><strong>Debug Mode:</strong> ${environmentLoader.getBoolean('DEBUG_MODE') ? 'Yes' : 'No'}</div>
+                    <div><strong>Contact Email:</strong> ${environmentLoader.get('CONTACT_EMAIL', 'Not Set')}</div>
+                    <div><strong>Analytics ID:</strong> ${environmentLoader.get('GOOGLE_ANALYTICS_ID', 'Not Set')}</div>
+                </div>
+            `;
+        }
+
+        function displayDebugInfo() {
+            const container = document.getElementById('debug-info');
+            try {
+                const debugInfo = environmentLoader.getDebugInfo();
+                
+                container.innerHTML = `
+                    <div class="text-sm space-y-2">
+                        <div><strong>Environment:</strong> ${debugInfo.environment}</div>
+                        <div><strong>Is Production:</strong> ${debugInfo.isProduction}</div>
+                        <div><strong>Is Development:</strong> ${debugInfo.isDevelopment}</div>
+                        <div><strong>Debug Mode:</strong> ${debugInfo.debugMode}</div>
+                    </div>
+                    <details class="mt-4">
+                        <summary class="cursor-pointer font-semibold">Configuration Object (Sensitive Data Masked)</summary>
+                        <pre class="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">${JSON.stringify(debugInfo.config, null, 2)}</pre>
+                    </details>
+                `;
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="status-error">Error getting debug info: ${error.message}</div>
+                `;
+            }
+        }
+
+        // Test functions
+        async function testFirebaseConnection() {
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '<div class="text-blue-600">Testing Firebase connection...</div>';
+            
+            try {
+                // Try to initialize Firebase with current config
+                const { initializeModularFirebase } = await import('./js/firebase-init.js');
+                const firebaseServices = await initializeModularFirebase();
+                
+                resultsContainer.innerHTML = `
+                    <div class="status-ok">✓ Firebase initialization successful!</div>
+                    <div class="text-sm mt-2">
+                        <div>Auth: ${firebaseServices.auth ? '✓' : '✗'}</div>
+                        <div>Firestore: ${firebaseServices.db ? '✓' : '✗'}</div>
+                        <div>Storage: ${firebaseServices.storage ? '✓' : '✗'}</div>
+                        <div>Analytics: ${firebaseServices.analytics ? '✓' : '✗'}</div>
+                    </div>
+                `;
+            } catch (error) {
+                resultsContainer.innerHTML = `
+                    <div class="status-error">✗ Firebase connection failed:</div>
+                    <div class="text-sm mt-1 text-red-600">${error.message}</div>
+                `;
+            }
+        }
+
+        function validateConfiguration() {
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '<div class="text-blue-600">Validating configuration...</div>';
+            
+            try {
+                environmentLoader.validateConfiguration();
+                resultsContainer.innerHTML = '<div class="status-ok">✓ Configuration validation passed!</div>';
+            } catch (error) {
+                resultsContainer.innerHTML = `
+                    <div class="status-error">✗ Configuration validation failed:</div>
+                    <div class="text-sm mt-1 text-red-600">${error.message}</div>
+                `;
+            }
+        }
+
+        function reloadConfiguration() {
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '<div class="text-blue-600">Reloading configuration...</div>';
+            
+            try {
+                // Re-initialize environment loader
+                const newLoader = new window.EnvironmentLoader();
+                resultsContainer.innerHTML = '<div class="status-ok">✓ Configuration reloaded successfully!</div>';
+                
+                // Refresh displays
+                setTimeout(() => {
+                    displayAllSections();
+                }, 1000);
+            } catch (error) {
+                resultsContainer.innerHTML = `
+                    <div class="status-error">✗ Configuration reload failed:</div>
+                    <div class="text-sm mt-1 text-red-600">${error.message}</div>
+                `;
+            }
+        }
+
+        function displayAllSections() {
+            displayLoaderStatus();
+            displayFirebaseConfig();
+            displaySanityConfig();
+            displayAppSettings();
+            displayDebugInfo();
+        }
+
+        // Event listeners
+        document.getElementById('test-firebase').addEventListener('click', testFirebaseConnection);
+        document.getElementById('validate-config').addEventListener('click', validateConfiguration);
+        document.getElementById('reload-config').addEventListener('click', reloadConfiguration);
+
+        // Initial display
+        document.addEventListener('DOMContentLoaded', () => {
+            displayAllSections();
+        });
+
+        // Auto-refresh every 30 seconds in development
+        if (environmentLoader.isDevelopment()) {
+            setInterval(displayAllSections, 30000);
+        }
+    </script>
+</body>
+</html>

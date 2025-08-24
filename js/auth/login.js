@@ -19,9 +19,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     let firebaseServices;
     try {
         firebaseServices = await initializeModularFirebase();
-        console.log('✅ Firebase initialized for login page');
     } catch (error) {
-        console.error('❌ Firebase initialization failed:', error);
+        console.error('Firebase initialization failed:', error);
         showError('Firebase initialization failed. Please refresh the page.');
         return;
     }
@@ -64,24 +63,23 @@ document.addEventListener('DOMContentLoaded', async function() {
                 };
                 
                 await setDoc(userDocRef, userProfile);
-                console.log('✅ User profile created in Firestore');
             } else {
                 // Update last login time
                 await updateDoc(userDocRef, {
                     lastLogin: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 });
-                console.log('✅ User profile updated with last login');
             }
         } catch (error) {
-            console.error('❌ Error ensuring user profile:', error);
+            console.error('Error ensuring user profile:', error);
             // Don't throw error here to avoid breaking the login flow
         }
     }
     
-    // Check if user is already logged in
+    // Check if user is already logged in (but don't redirect during login process)
+    let isLoggingIn = false;
     onAuthStateChanged(auth, (user) => {
-        if (user) {
+        if (user && !isLoggingIn) {
             // User is signed in, redirect to home
             window.location.href = '../index.html';
         }
@@ -99,6 +97,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         submitButton.classList.add('btn-loading');
         
         try {
+            isLoggingIn = true;
+            
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             // Successful login
             const user = userCredential.user;
@@ -111,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Handle errors
             showError(error.message);
         } finally {
+            isLoggingIn = false;
             submitButton.classList.remove('btn-loading');
         }
     });
@@ -119,6 +120,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     googleSignInBtn.addEventListener('click', async () => {
         const provider = new GoogleAuthProvider();
         try {
+            isLoggingIn = true;
+            
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
@@ -128,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             window.location.href = '../index.html'; // Redirect to home page
         } catch (error) {
             showError(error.message);
+        } finally {
+            isLoggingIn = false;
         }
     });
 
@@ -135,6 +140,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     githubSignInBtn.addEventListener('click', async () => {
         const provider = new GithubAuthProvider();
         try {
+            isLoggingIn = true;
+            
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
@@ -144,6 +151,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             window.location.href = '../index.html'; // Redirect to home page
         } catch (error) {
             showError(error.message);
+        } finally {
+            isLoggingIn = false;
         }
     });
 

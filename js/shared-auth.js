@@ -1,6 +1,6 @@
 /**
- * Main Website Authentication Handler
- * Manages user authentication state and profile display on the main website
+ * Shared Authentication Handler
+ * Provides consistent authentication across all website pages
  */
 
 import { initializeModularFirebase } from './firebase-init.js';
@@ -13,11 +13,16 @@ import {
     getDoc 
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-class MainAuthHandler {
-    constructor() {
+class SharedAuthHandler {
+    constructor(options = {}) {
         this.firebaseServices = null;
         this.currentUser = null;
         this.userProfile = null;
+        this.options = {
+            showDropdown: true,
+            redirectAfterLogin: null,
+            ...options
+        };
         this.init();
     }
 
@@ -36,7 +41,7 @@ class MainAuthHandler {
             this.setupUIEventListeners();
             
         } catch (error) {
-            console.error('Failed to initialize main auth handler:', error);
+            console.error('Failed to initialize shared auth handler:', error);
         }
     }
 
@@ -87,7 +92,8 @@ class MainAuthHandler {
                 };
             }
         } catch (error) {
-            console.error('Error loading user profile:', error);
+            console.error('Error loading user profile from database:', error);
+            
             // Fallback to basic user info
             this.userProfile = {
                 displayName: this.currentUser.displayName || 'User',
@@ -208,24 +214,26 @@ class MainAuthHandler {
      * Setup UI event listeners
      */
     setupUIEventListeners() {
-        // User menu dropdown toggle
-        const userMenuButton = document.getElementById('user-menu-button');
-        if (userMenuButton) {
-            userMenuButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.toggleUserDropdown();
+        // User menu dropdown toggle (if enabled)
+        if (this.options.showDropdown) {
+            const userMenuButton = document.getElementById('user-menu-button');
+            if (userMenuButton) {
+                userMenuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleUserDropdown();
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('user-dropdown');
+                const button = document.getElementById('user-menu-button');
+                
+                if (dropdown && !dropdown.contains(e.target) && !button?.contains(e.target)) {
+                    this.hideUserDropdown();
+                }
             });
         }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const dropdown = document.getElementById('user-dropdown');
-            const button = document.getElementById('user-menu-button');
-            
-            if (dropdown && !dropdown.contains(e.target) && !button?.contains(e.target)) {
-                this.hideUserDropdown();
-            }
-        });
 
         // Logout buttons
         const logoutButton = document.getElementById('logout-button');
@@ -257,7 +265,7 @@ class MainAuthHandler {
             if (link) {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    this.scrollToBlog();
+                    this.navigateToBlog();
                 });
             }
         });
@@ -277,6 +285,43 @@ class MainAuthHandler {
                 });
             }
         });
+    }
+
+    /**
+     * Navigate to blog page or section
+     */
+    navigateToBlog() {
+        // Check if we're on the main page with blog section
+        const blogSection = document.getElementById('blog');
+        if (blogSection) {
+            // Scroll to blog section on same page
+            blogSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        } else {
+            // Navigate to blog page
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('/blog/')) {
+                // Already on a blog page
+                if (currentPath.includes('blog-post.html')) {
+                    // Navigate from blog post to blog listing
+                    window.location.href = 'blog.html';
+                } else {
+                    // Already on blog listing, scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            } else {
+                // Navigate to blog page from main website
+                window.location.href = '/blog/blog.html';
+            }
+        }
+        
+        // Close mobile menu if open
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+        }
     }
 
     /**
@@ -316,31 +361,6 @@ class MainAuthHandler {
         } catch (error) {
             console.error('Error logging out:', error);
             this.showMessage('Error logging out. Please try again.', 'error');
-        }
-    }
-
-    /**
-     * Scroll to blog section smoothly
-     */
-    scrollToBlog() {
-        const blogSection = document.getElementById('blog');
-        if (blogSection) {
-            blogSection.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        } else {
-            // If blog section doesn't exist, scroll to bottom of page
-            window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-        
-        // Close mobile menu if open
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-            mobileMenu.classList.add('hidden');
         }
     }
 
@@ -431,10 +451,5 @@ class MainAuthHandler {
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.mainAuthHandler = new MainAuthHandler();
-});
-
 // Export for use in other modules
-export { MainAuthHandler };
+export { SharedAuthHandler };

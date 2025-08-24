@@ -10,6 +10,7 @@ import {
 import { 
     doc, 
     setDoc, 
+    getDoc,
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
@@ -18,9 +19,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     let firebaseServices;
     try {
         firebaseServices = await initializeModularFirebase();
-        console.log('✅ Firebase initialized for signup page');
     } catch (error) {
-        console.error('❌ Firebase initialization failed:', error);
+        console.error('Firebase initialization failed:', error);
         showError('Firebase initialization failed. Please refresh the page.');
         return;
     }
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 lastName: lastName || '',
                 displayName: user.displayName || `${firstName} ${lastName}`.trim(),
                 photoURL: user.photoURL || '',
-                role: 'user', // Default role
+                role: 'user',
                 status: 'active',
                 emailVerified: user.emailVerified,
                 createdAt: serverTimestamp(),
@@ -53,19 +53,31 @@ document.addEventListener('DOMContentLoaded', async function() {
             };
 
             // Create user document in Firestore
-            await setDoc(doc(database, 'users', user.uid), userProfile);
-            console.log('✅ User profile created in Firestore');
+            const userDocRef = doc(database, 'users', user.uid);
+            await setDoc(userDocRef, userProfile);
+            
+            // Verify the document was created
+            const userDoc = await getDoc(userDocRef);
+            
+            if (!userDoc.exists()) {
+                throw new Error('Profile creation verification failed');
+            }
             
         } catch (error) {
-            console.error('❌ Error creating user profile:', error);
-            // Don't throw error here to avoid breaking the signup flow
-            // The user account is still created in Firebase Auth
+            console.error('Error creating user profile:', error);
+            
+            if (error.code === 'permission-denied') {
+                throw new Error('Permission denied: Unable to create user profile');
+            }
+            
+            throw error;
         }
     }
     
-    // Check if user is already logged in
+    // Check if user is already logged in (but don't redirect during signup process)
+    let isSigningUp = false;
     onAuthStateChanged(auth, (user) => {
-        if (user) {
+        if (user && !isSigningUp) {
             // User is signed in, redirect to home
             window.location.href = '../index.html';
         }
@@ -120,6 +132,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         `;
         
         try {
+            isSigningUp = true;
+            
             // Create user account
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
@@ -132,9 +146,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Create user profile in Firestore
             await createUserProfile(user, firstName, lastName, db);
             
-            // Show success message and redirect
             showSuccess('Account created successfully! Redirecting...');
             
+            // Redirect after successful profile creation
             setTimeout(() => {
                 window.location.href = '../index.html';
             }, 2000);
@@ -143,6 +157,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.error('Signup error:', error);
             showError(error);
         } finally {
+            isSigningUp = false;
             // Restore button state
             submitButton.disabled = false;
             submitButton.innerHTML = 'Create Account';
@@ -204,6 +219,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Generic provider sign up function
     async function signUpWithProvider(provider, providerName) {
         try {
+            isSigningUp = true;
+            
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
             
@@ -216,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Create user profile in Firestore
             await createUserProfile(user, firstName, lastName, db);
             
-            // Successful sign up
             showSuccess(`Account created successfully with ${providerName}! Redirecting...`);
             
             setTimeout(() => {
@@ -226,6 +242,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         } catch (error) {
             console.error(`${providerName} signup error:`, error);
             showError(error);
+        } finally {
+            isSigningUp = false;
         }
     }
 

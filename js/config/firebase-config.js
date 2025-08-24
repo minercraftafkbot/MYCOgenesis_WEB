@@ -1,19 +1,18 @@
 // Unified Firebase configuration for both main website and CMS
 // Updated for Firebase v10.x (Latest)
 // This replaces both js/auth/firebase-config.js and cms/js/config/firebase-config.js
+// Now uses environment variables for secure configuration
 
-// Firebase configuration
-// Updated with actual MYCOgenesis project settings
-const firebaseConfig = {
-    apiKey: "AIzaSyA8ustH6URtqM5S4F_IUszDBpiflel3utI",
-    authDomain: "mycogen-57ade.firebaseapp.com",
-    databaseURL: "https://mycogen-57ade-default-rtdb.firebaseio.com",
-    projectId: "mycogen-57ade",
-    storageBucket: "mycogen-57ade.firebasestorage.app",
-    messagingSenderId: "987955981851",
-    appId: "1:987955981851:web:780126aeac499bf0d512be",
-    measurementId: "G-S0KN75E7HZ"
-};
+import environmentLoader from '../utils/environment-loader.js';
+
+// Get Firebase configuration from environment variables
+const firebaseConfig = environmentLoader.getFirebaseConfig();
+
+// Validate configuration
+if (!firebaseConfig.projectId || !firebaseConfig.apiKey) {
+    console.error('❌ Firebase configuration is incomplete. Please check your environment variables.');
+    throw new Error('Missing Firebase configuration. Please set up environment variables.');
+}
 
 // Validate configuration
 console.log("✅ Firebase configuration loaded for MYCOgenesis project");

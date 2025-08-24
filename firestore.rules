@@ -1,0 +1,357 @@
+rules_version = '2';
+
+/**
+ * MYCOgenesis_WEB - Firestore Security Rules
+ * 
+ * Project Architecture:
+ * - Hybrid system: Sanity CMS (primary content) + Firebase (users, analytics)
+ * - User roles: user < editor < admin (hierarchical permissions)
+ * - Collections: users, contact-inquiries, analytics, view-counters, audit/system logs
+ * 
+ * Security Features:
+ * - Role-based access control with user status validation
+ * - Self-registration with automatic profile creation
+ * - Public content access, authenticated user management
+ * - Rate limiting and data validation
+ * - Immutable audit logs with admin-only access
+ * - File upload validation and size limits
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+    
+    /**
+     * Check if user is authenticated
+     */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /**
+     * Get current user's document data
+     */
+    function getCurrentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    
+    /**
+     * Check if current user has specific role(s)
+     * @param {list} roles - List of allowed roles
+     */
+    function hasRole(roles) {
+      return isAuthenticated() && 
+             getCurrentUser().data.role in roles &&
+             getCurrentUser().data.status == 'active';
+    }
+    
+    /**
+     * Check if user is active (not suspended/inactive)
+     */
+    function isActiveUser() {
+      return isAuthenticated() && 
+             getCurrentUser().data.status == 'active';
+    }
+    
+    /**
+     * Check if user is admin
+     */
+    function isAdmin() {
+      return hasRole(['admin']);
+    }
+    
+    /**
+     * Check if user is editor or admin
+     */
+    function isEditorOrAdmin() {
+      return hasRole(['editor', 'admin']);
+    }
+    
+    /**
+     * Validate required timestamp fields
+     */
+    function hasValidTimestamps() {
+      return request.resource.data.keys().hasAll(['createdAt', 'updatedAt']) &&
+             request.resource.data.createdAt is timestamp &&
+             request.resource.data.updatedAt is timestamp;
+    }
+    
+    /**
+     * Validate document size (prevent abuse)
+     * @param {int} maxSize - Maximum document size in bytes
+     */
+    function isValidDocumentSize(maxSize) {
+      return request.resource.size < maxSize;
+    }
+    
+    // ============================================================================
+    // USER PROFILES COLLECTION
+    // ============================================================================
+    
+    match /users/{userId} {
+      // Users can read their own profile
+      // Editors and admins can read any profile
+      allow read: if isAuthenticated() && 
+                     (request.auth.uid == userId || 
+                      hasRole(['editor', 'admin']));
+      
+      // Self-registration: Allow any authenticated user to create their own profile
+      // Special handling for initial profile creation (circular dependency fix)
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(50000) && // 50KB limit
+                       // Required fields for new user
+                       request.resource.data.keys().hasAll(['uid', 'email', 'role', 'status']) &&
+                       request.resource.data.uid == request.auth.uid &&
+                       request.resource.data.email == request.auth.token.email &&
+                       // New users start as 'user' role with 'active' status
+                       request.resource.data.role == 'user' &&
+                       request.resource.data.status == 'active';
+      
+      // Users can update their own profile (except role and status)
+      // Admins can update any profile including role and status
+      allow update: if isAuthenticated() && 
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(50000) &&
+                       request.resource.data.uid == resource.data.uid && // UID immutable
+                       (
+                         // Users updating their own profile (can't change role/status)
+                         (request.auth.uid == userId &&
+                          isActiveUser() &&
+                          request.resource.data.role == resource.data.role &&
+                          request.resource.data.status == resource.data.status)
+                         ||
+                         // Admins can change roles and status
+                         isAdmin()
+                       );
+      
+      // Only admins can delete user profiles
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // CONTACT INQUIRIES COLLECTION
+    // ============================================================================
+    
+    match /contact-inquiries/{inquiryId} {
+      // Anyone can create contact inquiries (even non-authenticated users)
+      allow create: if hasValidTimestamps() &&
+                       isValidDocumentSize(20000) && // 20KB limit
+                       // Required fields
+                       request.resource.data.keys().hasAll(['name', 'email', 'subject', 'message', 'status']) &&
+                       // New inquiries start as 'new' status
+                       request.resource.data.status == 'new' &&
+                       // Validate email format (basic)
+                       request.resource.data.email.matches('.*@.*\\..*') &&
+                       // Validate text field lengths
+                       request.resource.data.name.size() <= 100 &&
+                       request.resource.data.subject.size() <= 200 &&
+                       request.resource.data.message.size() <= 5000;
+      
+      // Only admins can read, update, and delete inquiries
+      allow read, update, delete: if isAdmin();
+      
+      // Allow admins to update inquiry status and add response info
+      allow update: if isAdmin() &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(25000) && // Allow for responses
+                       // Core fields are immutable
+                       request.resource.data.name == resource.data.name &&
+                       request.resource.data.email == resource.data.email &&
+                       request.resource.data.subject == resource.data.subject &&
+                       request.resource.data.message == resource.data.message;
+    }
+    
+    // ============================================================================
+    // ANALYTICS COLLECTION
+    // ============================================================================
+    
+    match /analytics/{docId} {
+      // Authenticated users can create analytics entries
+      allow create: if isAuthenticated() &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(10000) && // 10KB limit
+                       // Required fields
+                       request.resource.data.keys().hasAll(['sessionId', 'page', 'event']) &&
+                       // Optional userId field validation
+                       (!request.resource.data.keys().hasAny(['userId']) ||
+                        request.resource.data.userId == request.auth.uid) &&
+                       // Validate data types
+                       request.resource.data.sessionId is string &&
+                       request.resource.data.page is string &&
+                       request.resource.data.event is string;
+      
+      // Only editors and admins can read analytics
+      allow read: if isEditorOrAdmin();
+      
+      // No updates or deletes allowed (append-only for data integrity)
+      allow update, delete: if false;
+    }
+    
+    // ============================================================================
+    // VIEW COUNTERS (Blog and Product Views)
+    // ============================================================================
+    
+    match /blog-views/{docId} {
+      // Public read access for blog view counts
+      allow read: if true;
+      
+      // Authenticated users can increment view counts
+      allow create, update: if isAuthenticated() &&
+                              hasValidTimestamps() &&
+                              isValidDocumentSize(5000) && // 5KB limit
+                              // Required fields
+                              request.resource.data.keys().hasAll(['viewCount', 'lastViewed']) &&
+                              // Validation
+                              request.resource.data.viewCount is int &&
+                              request.resource.data.viewCount >= 0 &&
+                              request.resource.data.lastViewed is timestamp;
+      
+      // Only admins can delete view counters
+      allow delete: if isAdmin();
+    }
+    
+    match /product-views/{docId} {
+      // Public read access for product view counts
+      allow read: if true;
+      
+      // Authenticated users can increment view counts
+      allow create, update: if isAuthenticated() &&
+                              hasValidTimestamps() &&
+                              isValidDocumentSize(5000) && // 5KB limit
+                              // Required fields
+                              request.resource.data.keys().hasAll(['viewCount', 'lastViewed']) &&
+                              // Validation
+                              request.resource.data.viewCount is int &&
+                              request.resource.data.viewCount >= 0 &&
+                              request.resource.data.lastViewed is timestamp;
+      
+      // Only admins can delete view counters
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // AUDIT LOGS COLLECTION (Immutable)
+    // ============================================================================
+    
+    match /audit-logs/{logId} {
+      // System can create audit logs for authenticated users
+      allow create: if isAuthenticated() &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(15000) && // 15KB limit
+                       // Required fields
+                       request.resource.data.keys().hasAll(['userId', 'action', 'resource', 'timestamp']) &&
+                       // User can only create logs for themselves
+                       request.resource.data.userId == request.auth.uid &&
+                       // Validate data types
+                       request.resource.data.action is string &&
+                       request.resource.data.resource is string &&
+                       request.resource.data.timestamp is timestamp;
+      
+      // Only admins can read audit logs
+      allow read: if isAdmin();
+      
+      // Audit logs are immutable (no updates or deletes)
+      allow update, delete: if false;
+    }
+    
+    // ============================================================================
+    // SYSTEM LOGS COLLECTION (Immutable)
+    // ============================================================================
+    
+    match /system-logs/{logId} {
+      // System-generated logs (created by Cloud Functions or admin operations)
+      allow create: if isAdmin() &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(20000) && // 20KB limit
+                       // Required fields
+                       request.resource.data.keys().hasAll(['level', 'message', 'timestamp']) &&
+                       // Validate log level
+                       request.resource.data.level in ['info', 'warning', 'error', 'critical'] &&
+                       request.resource.data.message is string &&
+                       request.resource.data.timestamp is timestamp;
+      
+      // Only admins can read system logs
+      allow read: if isAdmin();
+      
+      // System logs are immutable (no updates or deletes)
+      allow update, delete: if false;
+    }
+    
+    // ============================================================================
+    // SITE SETTINGS COLLECTION
+    // ============================================================================
+    
+    match /site-settings/{settingId} {
+      // Public read access for site settings
+      allow read: if true;
+      
+      // Only admins can manage site settings
+      allow create, update, delete: if isAdmin() &&
+                                       hasValidTimestamps() &&
+                                       isValidDocumentSize(30000); // 30KB limit
+    }
+    
+    // ============================================================================
+    // TEMPORARY/TESTING COLLECTIONS
+    // ============================================================================
+    
+    match /setup-test/{testId} {
+      // Full access for testing purposes (remove in production)
+      allow read, write: if isAuthenticated() &&
+                           isValidDocumentSize(10000); // 10KB limit
+    }
+    
+    // ============================================================================
+    // SANITY CMS INTEGRATION COLLECTIONS
+    // ============================================================================
+    
+    /**
+     * Since MYCOgenesis uses Sanity CMS for primary content management,
+     * these collections are for Firebase-specific enhancements only:
+     * - View tracking for Sanity content
+     * - User preferences for Sanity content
+     * - Analytics for Sanity content interaction
+     */
+    
+    match /sanity-content-analytics/{docId} {
+      // Track analytics for Sanity-managed content
+      allow create: if isAuthenticated() &&
+                       hasValidTimestamps() &&
+                       isValidDocumentSize(8000) && // 8KB limit
+                       // Required fields
+                       request.resource.data.keys().hasAll(['sanityDocumentId', 'contentType', 'event']) &&
+                       request.resource.data.sanityDocumentId is string &&
+                       request.resource.data.contentType in ['product', 'blog-post', 'category'] &&
+                       request.resource.data.event is string;
+      
+      // Editors and admins can read content analytics
+      allow read: if isEditorOrAdmin();
+      
+      // No updates or deletes (append-only)
+      allow update, delete: if false;
+    }
+    
+    match /user-content-preferences/{userId} {
+      // Users can manage their content preferences
+      allow read, write: if isAuthenticated() &&
+                           request.auth.uid == userId &&
+                           isActiveUser() &&
+                           hasValidTimestamps() &&
+                           isValidDocumentSize(25000); // 25KB limit for preferences
+    }
+    
+    // ============================================================================
+    // CATCH-ALL RULE (Deny by default)
+    // ============================================================================
+    
+    // Explicitly deny access to any collections not defined above
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

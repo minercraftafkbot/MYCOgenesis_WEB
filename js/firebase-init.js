@@ -4,8 +4,11 @@
  * Updated for Firebase v10.x
  */
 
-// Import Firebase configuration
-import { firebaseConfig } from './config/firebase-config.js';
+// Import Firebase configuration (now from environment variables)
+import environmentLoader from './utils/environment-loader.js';
+
+// Get Firebase configuration from environment variables
+const firebaseConfig = environmentLoader.getFirebaseConfig();
 
 /**
  * Initialize Firebase with modular SDK (for modern applications)
@@ -41,19 +44,57 @@ export async function initializeModularFirebase() {
         // Connect to emulators in development
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             try {
-                // Only connect if not already connected
-                if (!auth._delegate._config.emulator) {
-                    connectAuthEmulator(auth, 'http://localhost:9099');
+                // Only connect if not already connected (check for existing emulator config)
+                let authEmulatorConnected = false;
+                let firestoreEmulatorConnected = false;
+                let storageEmulatorConnected = false;
+                
+                try {
+                    // Check if auth emulator is already connected
+                    if (auth.config?.emulator) {
+                        authEmulatorConnected = true;
+                    } else {
+                        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+                        authEmulatorConnected = true;
+                    }
+                } catch (e) {
+                    // Auth emulator already connected or failed
+                    if (e.message?.includes('emulator')) {
+                        authEmulatorConnected = true;
+                    }
                 }
-                if (!db._delegate._databaseId.projectId.includes('mycogen-57ade')) {
+                
+                try {
+                    // Check if firestore emulator is already connected
                     connectFirestoreEmulator(db, 'localhost', 8080);
+                    firestoreEmulatorConnected = true;
+                } catch (e) {
+                    // Firestore emulator already connected or failed
+                    if (e.message?.includes('emulator')) {
+                        firestoreEmulatorConnected = true;
+                    }
                 }
-                if (!storage._delegate._host.includes('localhost')) {
+                
+                try {
+                    // Check if storage emulator is already connected
                     connectStorageEmulator(storage, 'localhost', 9199);
+                    storageEmulatorConnected = true;
+                } catch (e) {
+                    // Storage emulator already connected or failed
+                    if (e.message?.includes('emulator')) {
+                        storageEmulatorConnected = true;
+                    }
                 }
-                console.log('🔧 Connected to Firebase emulators');
+                
+                if (authEmulatorConnected || firestoreEmulatorConnected || storageEmulatorConnected) {
+                    console.log('🔧 Firebase emulators configured:', {
+                        auth: authEmulatorConnected,
+                        firestore: firestoreEmulatorConnected,
+                        storage: storageEmulatorConnected
+                    });
+                }
             } catch (error) {
-                console.warn('Emulator connection failed (may already be connected):', error);
+                console.warn('Emulator configuration completed (some may already be connected):', error.message);
             }
         }
         

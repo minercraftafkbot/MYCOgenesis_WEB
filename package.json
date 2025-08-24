@@ -1,0 +1,26 @@
+{
+  "name": "mycogenesis_web",
+  "version": "1.0.0",
+  "description": "> **Cultivating Tomorrow's Flavors, Today** - A modern web platform for sustainable mushroom farming with IoT integration and professional content management.",
+  "main": "test-firebase-rules.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "tailwindcss -i src/input.css -o css/tailwind.css",
+    "watch-css": "tailwindcss -i src/input.css -o css/tailwind.css --watch",
+    "dev": "npm run watch-css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/praveensaummya/MYCOgenesis_WEB.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/praveensaummya/MYCOgenesis_WEB/issues"
+  },
+  "homepage": "https://github.com/praveensaummya/MYCOgenesis_WEB#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.1.12"
+  }
+}
