@@ -1,8 +1,9 @@
 /**
  * Blog Content Loader
- * Dynamically loads and displays blog content from Firestore
+ * Dynamically loads and displays blog content from Sanity CMS
  */
 
+import { sanityService } from '../services/sanity-service.js';
 import { publicContentService } from '../services/public-content-service.js';
 
 export class BlogLoader {
@@ -36,7 +37,8 @@ export class BlogLoader {
      */
     async loadFeaturedPost() {
         try {
-            const featuredPosts = await publicContentService.getPublishedBlogPosts({
+            // Try Sanity first
+            let featuredPosts = await sanityService.getBlogPosts({
                 featured: true,
                 limit: 1
             });
@@ -45,13 +47,30 @@ export class BlogLoader {
                 this.renderFeaturedPost(featuredPosts[0]);
             } else {
                 // Fallback to latest post if no featured post
-                const latestPosts = await publicContentService.getPublishedBlogPosts({ limit: 1 });
+                const latestPosts = await sanityService.getBlogPosts({ limit: 1 });
                 if (latestPosts.length > 0) {
                     this.renderFeaturedPost(latestPosts[0]);
+                } else {
+                    console.log('No blog posts found in Sanity, trying Firestore fallback');
+                    // Final fallback to Firestore
+                    const fireStorePosts = await publicContentService.getPublishedBlogPosts({ limit: 1 });
+                    if (fireStorePosts.length > 0) {
+                        this.renderFeaturedPost(fireStorePosts[0]);
+                    }
                 }
             }
         } catch (error) {
             console.error('Error loading featured post:', error);
+            console.log('Trying Firestore fallback for featured post');
+            // Final fallback to Firestore
+            try {
+                const fireStorePosts = await publicContentService.getPublishedBlogPosts({ limit: 1 });
+                if (fireStorePosts.length > 0) {
+                    this.renderFeaturedPost(fireStorePosts[0]);
+                }
+            } catch (fallbackError) {
+                console.error('Featured post fallback also failed:', fallbackError);
+            }
         }
     }
 
@@ -73,10 +92,31 @@ export class BlogLoader {
             };
 
             let posts;
-            if (this.searchTerm) {
-                posts = await publicContentService.searchBlogPosts(this.searchTerm, this.postsPerPage);
-            } else {
-                posts = await publicContentService.getPublishedBlogPosts(options);
+            try {
+                // Try Sanity first
+                if (this.searchTerm) {
+                    // For now, use simple filtering for search since Sanity doesn't have built-in search
+                    const allPosts = await sanityService.getBlogPosts({ limit: 50 });
+                    const searchTerm = this.searchTerm.toLowerCase();
+                    posts = allPosts.filter(post => 
+                        post.title.toLowerCase().includes(searchTerm) ||
+                        post.excerpt?.toLowerCase().includes(searchTerm) ||
+                        (post.categories && post.categories.some(cat => cat.toLowerCase().includes(searchTerm)))
+                    ).slice(0, this.postsPerPage);
+                } else {
+                    posts = await sanityService.getBlogPosts(options);
+                }
+
+                console.log(`✅ Loaded ${posts.length} blog posts from Sanity CMS`);
+            } catch (sanityError) {
+                console.warn('Sanity CMS failed, trying Firestore fallback:', sanityError);
+                // Fallback to Firestore
+                if (this.searchTerm) {
+                    posts = await publicContentService.searchBlogPosts(this.searchTerm, this.postsPerPage);
+                } else {
+                    posts = await publicContentService.getPublishedBlogPosts(options);
+                }
+                console.log(`⚠️ Used Firestore fallback, loaded ${posts.length} posts`);
             }
 
             if (append) {
