@@ -439,31 +439,8 @@ class EnhancedHomeLoader {
       try {
         const sanityService = window.sanityService;
         if (sanityService) {
-          const query = `*[_type == "blogPost" && defined(publishedAt)] | order(publishedAt desc)[0...3] {
-            _id,
-            title,
-            slug,
-            excerpt,
-            publishedAt,
-            featuredImage {
-              asset-> {
-                _id,
-                url
-              },
-              alt
-            },
-            category,
-            author-> {
-              name,
-              image {
-                asset-> {
-                  url
-                }
-              }
-            }
-          }`;
-          
-          return await sanityService.fetch(query);
+          // Use the Sanity service's getBlogPosts method which handles image transformation properly
+          return await sanityService.getBlogPosts({ limit: 3 });
         }
       } catch (error) {
         console.warn('Sanity blog posts not available, using Firestore fallback:', error);
@@ -607,9 +584,15 @@ class EnhancedHomeLoader {
   }
 
   getBlogImageUrl(post) {
+    // First try the transformed URL from Sanity service
+    if (post.featuredImage?.url) {
+      return post.featuredImage.url;
+    }
+    // Fallback to direct asset URL (for non-transformed data)
     if (post.featuredImage?.asset?.url) {
       return post.featuredImage.asset.url;
     }
+    // Default fallback image
     return 'https://images.unsplash.com/photo-1542179224-445833e88414?q=80&w=600&auto=format&fit=crop';
   }
 
