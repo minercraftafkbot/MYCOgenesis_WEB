@@ -41,8 +41,25 @@ export async function initializeModularFirebase() {
             }
         }
         
-        // Connect to emulators in development
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Connect to emulators ONLY in local development
+        const isLocalDevelopment = window.location.hostname === 'localhost' || 
+                                   window.location.hostname === '127.0.0.1' ||
+                                   window.location.hostname.includes('localhost');
+        
+        const isVercelDeployment = window.location.hostname.includes('.vercel.app') || 
+                                   window.location.hostname.includes('mycogenesis.com');
+        
+        // Log environment detection
+        console.log('🌍 Environment Detection:', {
+            hostname: window.location.hostname,
+            isLocalDevelopment,
+            isVercelDeployment,
+            willUseEmulators: isLocalDevelopment && !isVercelDeployment
+        });
+        
+        // Skip emulators for production deployments
+        if (isLocalDevelopment && !isVercelDeployment) {
+            console.log('🔧 Connecting to Firebase emulators...');
             try {
                 // Only connect if not already connected (check for existing emulator config)
                 let authEmulatorConnected = false;
@@ -66,7 +83,7 @@ export async function initializeModularFirebase() {
                 
                 try {
                     // Check if firestore emulator is already connected
-                    connectFirestoreEmulator(db, 'localhost', 8080);
+                    connectFirestoreEmulator(db, 'localhost', 8082);
                     firestoreEmulatorConnected = true;
                 } catch (e) {
                     // Firestore emulator already connected or failed
