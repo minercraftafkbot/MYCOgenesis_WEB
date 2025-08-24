@@ -714,3 +714,9 @@ class SanityService {
 // Export singleton instance
 export const sanityService = new SanityService();
 export default sanityService;
+
+// Make available globally for debugging and use by other scripts
+if (typeof window !== 'undefined') {
+    window.sanityService = sanityService;
+    console.log('✅ Sanity service loaded and available globally');
+}

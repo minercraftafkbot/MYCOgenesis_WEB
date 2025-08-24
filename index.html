@@ -993,8 +993,8 @@
             return;
           }
 
-          // Check user role (assuming role is stored in the user profile)
-          const userRole = user.role || 'user';
+          // Check user role (role is stored in user.profile.role)
+          const userRole = user.profile?.role || 'user';
           if (userRole !== 'editor' && userRole !== 'admin') {
             alert('🔒 Access Denied\n\nYou need editor or admin privileges to access the Content Management System.\n\nContact an administrator to request access.');
             return;
