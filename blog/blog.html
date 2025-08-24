@@ -323,14 +323,35 @@
     <!-- Shared Authentication System -->
     <script type="module">
         import { SharedAuthHandler } from '../js/shared-auth.js';
+        import { initializeModularFirebase } from '../js/firebase-init.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
         
         // Initialize shared authentication for blog page
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🔄 Initializing authentication for blog page');
             
             try {
-                // Always create a new SharedAuthHandler instance for this page
-                // Firebase auth state will be automatically restored by Firebase SDK
+                // First initialize Firebase directly to check auth state
+                const firebaseServices = await initializeModularFirebase();
+                const { auth } = firebaseServices;
+                
+                // Wait for auth state to be determined before creating handler
+                const authPromise = new Promise((resolve) => {
+                    const unsubscribe = onAuthStateChanged(auth, (user) => {
+                        unsubscribe(); // Only listen once for initial state
+                        resolve(user);
+                    });
+                });
+                
+                const currentUser = await authPromise;
+                
+                if (currentUser) {
+                    console.log('✅ User already authenticated:', currentUser.email);
+                } else {
+                    console.log('ℹ️  No authenticated user found');
+                }
+                
+                // Now create the SharedAuthHandler which will properly handle the existing state
                 window.blogAuthHandler = new SharedAuthHandler({
                     showDropdown: true,
                     redirectAfterLogin: null
@@ -341,18 +362,14 @@
                 
                 console.log('✅ Blog page authentication initialized');
                 
-                // Give Firebase a moment to restore auth state
-                setTimeout(() => {
-                    const currentUser = window.blogAuthHandler?.getCurrentUser();
-                    if (currentUser) {
-                        console.log('✅ User authentication restored:', currentUser.email);
-                    } else {
-                        console.log('ℹ️  No authenticated user found');
-                    }
-                }, 1000);
-                
             } catch (error) {
                 console.error('❌ Failed to initialize blog page authentication:', error);
+                // Fallback: create handler anyway
+                window.blogAuthHandler = new SharedAuthHandler({
+                    showDropdown: true,
+                    redirectAfterLogin: null
+                });
+                window.mainAuthHandler = window.blogAuthHandler;
             }
         });
     </script>

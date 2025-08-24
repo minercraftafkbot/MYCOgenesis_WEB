@@ -23,6 +23,11 @@ class SharedAuthHandler {
             redirectAfterLogin: null,
             ...options
         };
+        
+        // Promise that resolves when authentication state is determined
+        this.authReady = null;
+        this.resolveAuthReady = null;
+        
         this.init();
     }
 

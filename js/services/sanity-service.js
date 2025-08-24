@@ -301,7 +301,7 @@ class SanityService {
         return {
             ...post,
             slug: post.slug?.current,
-            featuredImage: post.featuredImage ? {
+            featuredImage: post.featuredImage?.asset ? {
                 ...post.featuredImage,
                 url: this.urlFor(post.featuredImage.asset).width(1200).height(630).format('webp').url()
             } : null,
