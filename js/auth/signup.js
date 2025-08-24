@@ -65,9 +65,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             
         } catch (error) {
             console.error('Error creating user profile:', error);
+            console.error('Error details:', {
+                code: error.code,
+                message: error.message,
+                userUID: user.uid,
+                userEmail: user.email,
+                profileData: userProfile
+            });
             
             if (error.code === 'permission-denied') {
-                throw new Error('Permission denied: Unable to create user profile');
+                throw new Error('Permission denied: Unable to create user profile. Please check Firestore rules.');
             }
             
             throw error;
