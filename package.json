@@ -2,9 +2,8 @@
   "name": "mycogenesis_web",
   "version": "1.0.0",
   "description": "> **Cultivating Tomorrow's Flavors, Today** - A modern web platform for sustainable mushroom farming with IoT integration and professional content management.",
-  "main": "test-firebase-rules.js",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build-css": "tailwindcss -i src/input.css -o css/tailwind.css",
     "watch-css": "tailwindcss -i src/input.css -o css/tailwind.css --watch",
     "dev": "npm run watch-css"
