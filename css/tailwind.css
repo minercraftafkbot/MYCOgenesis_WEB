@@ -560,9 +560,6 @@
   .max-h-96 {
     max-height: calc(var(--spacing) * 96);
   }
-  .min-h-12 {
-    min-height: calc(var(--spacing) * 12);
-  }
   .min-h-\[60vh\] {
     min-height: 60vh;
   }
@@ -816,9 +813,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .overflow-auto {
-    overflow: auto;
-  }
   .overflow-hidden {
     overflow: hidden;
   }
@@ -1030,9 +1024,6 @@
   }
   .bg-purple-50 {
     background-color: var(--color-purple-50);
-  }
-  .bg-purple-600 {
-    background-color: var(--color-purple-600);
   }
   .bg-red-50 {
     background-color: var(--color-red-50);
@@ -1303,9 +1294,6 @@
   }
   .text-gray-400 {
     color: var(--color-gray-400);
-  }
-  .text-gray-500 {
-    color: var(--color-gray-500);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
@@ -1580,13 +1568,6 @@
       }
     }
   }
-  .hover\:bg-blue-700 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-blue-700);
-      }
-    }
-  }
   .hover\:bg-gray-50 {
     &:hover {
       @media (hover: hover) {
@@ -1612,20 +1593,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-green-200);
-      }
-    }
-  }
-  .hover\:bg-green-700 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-green-700);
-      }
-    }
-  }
-  .hover\:bg-purple-700 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-purple-700);
       }
     }
   }

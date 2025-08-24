@@ -44,15 +44,18 @@ service cloud.firestore {
      */
     function hasRole(roles) {
       return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              getCurrentUser().data.role in roles &&
              getCurrentUser().data.status == 'active';
     }
     
     /**
      * Check if user is active (not suspended/inactive)
+     * Only works if user profile exists
      */
     function isActiveUser() {
       return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
              getCurrentUser().data.status == 'active';
     }
     
