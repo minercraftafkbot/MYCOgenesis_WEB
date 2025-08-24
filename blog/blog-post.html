@@ -71,6 +71,51 @@ section to keep visitors engaged. -->
                 width: 100%;
             }
         }
+
+        /* User Profile Styles */
+        #user-avatar,
+        #user-avatar-blog,
+        #tablet-user-avatar,
+        #mobile-user-avatar {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        #user-avatar:hover,
+        #user-avatar-blog:hover,
+        #tablet-user-avatar:hover,
+        #mobile-user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        /* Profile Blog Link Styles */
+        #profile-blog-link:hover #user-avatar-blog,
+        #tablet-profile-blog-link:hover #tablet-user-avatar {
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.3);
+        }
+
+        #mobile-profile-blog-link:hover {
+            background-color: rgba(13, 148, 136, 0.1);
+        }
+
+        #user-dropdown {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Message notification styles */
+        .message-notification {
+            backdrop-filter: blur(8px);
+        }
     </style>
 </head>
 <body class="bg-white text-slate-800">
@@ -90,22 +135,65 @@ section to keep visitors engaged. -->
                 <a href="../blog/blog.html" class="text-teal-600 font-bold px-3 py-2 rounded-md text-sm font-medium bg-teal-50/50 transition-all duration-200">Blog</a>
                 <a href="../index.html#contact" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Contact</a>
             </div>
+            <!-- Authentication Section -->
             <div class="hidden lg:flex items-center space-x-4 ml-4 pl-4 border-l border-slate-200">
-                <a href="../auth/login.html" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Login</a>
-                <a href="../auth/signup.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-md">Sign Up</a>
+                <!-- Not Logged In -->
+                <div id="auth-not-logged-in" class="flex items-center space-x-4">
+                    <a href="../auth/login.html" class="text-slate-600 hover:text-teal-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">Login</a>
+                    <a href="../auth/signup.html" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-md">Sign Up</a>
+                </div>
+
+                <!-- Logged In -->
+                <div id="auth-logged-in" class="hidden flex items-center space-x-3">
+                    <!-- Profile Avatar Link to Blog -->
+                    <a href="../blog/blog.html" id="profile-blog-link" class="flex items-center p-1 rounded-full hover:ring-2 hover:ring-teal-200 transition-all duration-200" title="Go to Blog">
+                        <img id="user-avatar-blog" src="" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-teal-200">
+                    </a>
+                    
+                    <!-- User Menu Dropdown -->
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center p-1 rounded-full hover:ring-2 hover:ring-teal-200 transition-all duration-200">
+                            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <!-- User Dropdown Menu -->
+                        <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                            <div class="py-1">
+                                <a href="#" id="profile-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Profile</a>
+                                <a href="#" id="orders-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
+                                <a href="#" id="preferences-link" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Preferences</a>
+                                <div class="border-t border-gray-100"></div>
+                                <button id="logout-button" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Sign Out</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- Tablet Navigation -->
             <div class="hidden md:flex lg:hidden items-center space-x-2">
+                <!-- Menu button (always visible) -->
                 <a href="#" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"/>
                     </svg>
                 </a>
-                <a href="../auth/login.html" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                </a>
+
+                <!-- Not logged in -->
+                <div id="tablet-auth-not-logged-in" class="flex items-center space-x-2">
+                    <a href="../auth/login.html" class="text-slate-600 hover:text-teal-600 p-2 rounded-md hover:bg-teal-50/50 transition-all duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Logged in -->
+                <div id="tablet-auth-logged-in" class="hidden">
+                    <a href="../blog/blog.html" id="tablet-profile-blog-link" class="flex items-center p-1 rounded-full hover:ring-2 hover:ring-teal-200 transition-all duration-200" title="Go to Blog">
+                        <img id="tablet-user-avatar" src="" alt="User Avatar" class="w-8 h-8 rounded-full object-cover border-2 border-teal-200">
+                    </a>
+                </div>
             </div>
             <!-- Mobile Menu Button -->
             <div class="md:hidden">
@@ -127,9 +215,32 @@ section to keep visitors engaged. -->
                 <a href="../blog/blog.html" class="block px-3 py-2 text-base font-medium text-teal-600 bg-teal-50/50 rounded-md transition-all duration-200">Blog</a>
                 <a href="../index.html#contact" class="block px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Contact</a>
             </div>
+            <!-- Mobile Authentication Section -->
             <div class="px-4 py-3 border-t border-slate-200 space-y-2">
-                <a href="../auth/login.html" class="block w-full px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Login</a>
-                <a href="../auth/signup.html" class="block w-full px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md text-center transition-all duration-200">Sign Up</a>
+                <!-- Not Logged In (Mobile) -->
+                <div id="mobile-auth-not-logged-in" class="space-y-2">
+                    <a href="../auth/login.html" class="block w-full px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">Login</a>
+                    <a href="../auth/signup.html" class="block w-full px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md text-center transition-all duration-200">Sign Up</a>
+                </div>
+
+                <!-- Logged In (Mobile) -->
+                <div id="mobile-auth-logged-in" class="hidden space-y-2">
+                    <a href="../blog/blog.html" id="mobile-profile-blog-link" class="flex items-center space-x-3 px-3 py-2 bg-teal-50 rounded-md hover:bg-teal-100 transition-all duration-200">
+                        <img id="mobile-user-avatar" src="" alt="User Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-teal-200">
+                        <div class="flex-1">
+                            <div id="mobile-user-name" class="font-medium text-slate-700"></div>
+                            <div id="mobile-user-email" class="text-sm text-slate-500"></div>
+                        </div>
+                        <div class="text-teal-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
+                    <a href="#" id="mobile-profile-link" class="block w-full px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">My Profile</a>
+                    <a href="#" id="mobile-orders-link" class="block w-full px-3 py-2 text-base font-medium text-slate-600 hover:text-teal-600 hover:bg-teal-50/50 rounded-md transition-all duration-200">My Orders</a>
+                    <button id="mobile-logout-button" class="block w-full px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md text-left transition-all duration-200">Sign Out</button>
+                </div>
             </div>
         </div>
     </header>
@@ -172,33 +283,19 @@ section to keep visitors engaged. -->
         <section class="py-20 bg-stone-50">
             <div class="container mx-auto px-6">
                 <h2 class="text-3xl font-bold text-center mb-12">You Might Also Like</h2>
-                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                        <a href="#" class="block">
-                            <img src="https://images.unsplash.com/photo-1596702652410-912a20a41d5a?q=80&w=600&auto=format&fit=crop" alt="Agricultural waste like sawdust and wood chips" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="font-bold text-lg mb-2">Waste Not, Want Not: Our Commitment to a Circular Economy</h3>
-                                <p class="text-slate-600 text-sm">Learn how our substrate is made from agricultural byproducts.</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                        <a href="#" class="block">
-                            <img src="images/Featured_varieties/oyster_mashroon.png" alt="Oyster Mushrooms" class="w-full h-48 object-cover">
-                            <div class="p-6">
-                                <h3 class="font-bold text-lg mb-2">A Deep Dive into Oyster Mushroom Cultivation</h3>
-                                <p class="text-slate-600 text-sm">The specific environmental needs for one of our favorite varieties.</p>
-                            </div>
-                        </a>
-                    </div>
-                     <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                        <a href="#" class="block">
-                           <img src="https://images.unsplash.com/photo-1604313324216-a7c751e7dd1e?q=80&w=600&auto=format&fit=crop" alt="Lion's Mane Mushroom close-up" class="w-full h-48 object-cover">
-                           <div class="p-6">
-                               <h3 class="font-bold text-lg mb-2">Unlocking the Power of Lion's Mane</h3>
-                               <p class="text-slate-600 text-sm">Exploring the health benefits of this incredible functional mushroom.</p>
-                           </div>
-                       </div>
+                
+                <!-- Loading spinner -->
+                <div id="loading-spinner" class="hidden text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+                    <p class="mt-2 text-slate-600">Loading content...</p>
+                </div>
+
+                <!-- Error message -->
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+
+                <!-- Related posts grid -->
+                <div id="related-posts-grid" class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Related posts will be loaded dynamically -->
                 </div>
             </div>
         </section>
@@ -253,5 +350,22 @@ section to keep visitors engaged. -->
             }
         });
     </script>
+
+    <!-- Shared Authentication System -->
+    <script type="module">
+        import { SharedAuthHandler } from '../js/shared-auth.js';
+        
+        // Initialize shared authentication for blog post page
+        document.addEventListener('DOMContentLoaded', () => {
+            window.blogPostAuthHandler = new SharedAuthHandler({
+                showDropdown: true,
+                redirectAfterLogin: null
+            });
+        });
+    </script>
+
+    <!-- Dynamic Content Loading -->
+    <script type="module" src="../js/dynamic-content/blog-post-loader.js"></script>
+    <script type="module" src="../js/services/real-time-content-service.js"></script>
 </body>
 </html>

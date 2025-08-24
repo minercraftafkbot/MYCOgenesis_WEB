@@ -1,0 +1,301 @@
+rules_version = '2';
+
+/**
+ * MYCOgenesis_WEB - Firebase Storage Security Rules
+ * 
+ * Storage Structure:
+ * - images/blog/{blogId}/{imageId} - Blog post images
+ * - images/products/{productId}/{imageId} - Product images (Sanity-managed)
+ * - images/users/{userId}/{imageId} - User avatars
+ * - uploads/{userId}/{fileName} - General file uploads
+ * - temp/{userId}/{fileName} - Temporary uploads (24h cleanup)
+ * 
+ * Security Features:
+ * - Role-based access control
+ * - File type and size validation
+ * - User status verification
+ * - Path-based permissions
+ * - Content-type validation
+ */
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+    
+    /**
+     * Check if user is authenticated
+     */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /**
+     * Get current user's profile data from Firestore
+     */
+    function getCurrentUser() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid));
+    }
+    
+    /**
+     * Check if user has specific role(s) and is active
+     */
+    function hasRole(roles) {
+      return isAuthenticated() && 
+             getCurrentUser().data.role in roles &&
+             getCurrentUser().data.status == 'active';
+    }
+    
+    /**
+     * Check if user is active
+     */
+    function isActiveUser() {
+      return isAuthenticated() && 
+             getCurrentUser().data.status == 'active';
+    }
+    
+    /**
+     * Check if user is admin
+     */
+    function isAdmin() {
+      return hasRole(['admin']);
+    }
+    
+    /**
+     * Check if user is editor or admin
+     */
+    function isEditorOrAdmin() {
+      return hasRole(['editor', 'admin']);
+    }
+    
+    /**
+     * Validate image file types
+     */
+    function isValidImageType() {
+      return request.resource.contentType.matches('image/(jpeg|jpg|png|gif|webp|svg\\+xml)');
+    }
+    
+    /**
+     * Validate document file types
+     */
+    function isValidDocumentType() {
+      return request.resource.contentType.matches('(application/(pdf|msword|vnd\\.openxmlformats-officedocument\\.wordprocessingml\\.document)|text/(plain|markdown))');
+    }
+    
+    /**
+     * Validate image file size (10MB limit)
+     */
+    function isValidImageSize() {
+      return request.resource.size <= 10 * 1024 * 1024; // 10MB
+    }
+    
+    /**
+     * Validate document file size (50MB limit)
+     */
+    function isValidDocumentSize() {
+      return request.resource.size <= 50 * 1024 * 1024; // 50MB
+    }
+    
+    /**
+     * Validate filename (alphanumeric, dots, dashes, underscores only)
+     */
+    function hasValidFilename() {
+      return resource.name.matches('[a-zA-Z0-9._-]{1,100}');
+    }
+    
+    // ============================================================================
+    // BLOG IMAGES
+    // ============================================================================
+    
+    match /images/blog/{blogId}/{imageId} {
+      // Public read access for published blog images
+      allow read: if true;
+      
+      // Editors and admins can upload blog images
+      allow write: if isEditorOrAdmin() &&
+                      isValidImageType() &&
+                      isValidImageSize() &&
+                      hasValidFilename();
+      
+      // Only admins can delete blog images
+      allow delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // PRODUCT IMAGES (Sanity CMS Integration)
+    // ============================================================================
+    
+    match /images/products/{productId}/{imageId} {
+      // Public read access for product images
+      allow read: if true;
+      
+      // Only admins can manage product images (since products are managed via Sanity)
+      allow write, delete: if isAdmin() &&
+                              isValidImageType() &&
+                              isValidImageSize() &&
+                              hasValidFilename();
+    }
+    
+    // ============================================================================
+    // USER AVATARS
+    // ============================================================================
+    
+    match /images/users/{userId}/{imageId} {
+      // Public read access for user avatars
+      allow read: if true;
+      
+      // Users can upload their own avatars
+      // Admins can manage any user's avatars
+      allow write: if isAuthenticated() &&
+                      isValidImageType() &&
+                      isValidImageSize() &&
+                      hasValidFilename() &&
+                      (
+                        // Users can upload their own avatars
+                        (request.auth.uid == userId && isActiveUser()) ||
+                        // Admins can manage any avatar
+                        isAdmin()
+                      );
+      
+      // Users can delete their own avatars, admins can delete any
+      allow delete: if isAuthenticated() &&
+                       (
+                         (request.auth.uid == userId && isActiveUser()) ||
+                         isAdmin()
+                       );
+    }
+    
+    // ============================================================================
+    // GENERAL FILE UPLOADS
+    // ============================================================================
+    
+    match /uploads/{userId}/{fileName} {
+      // Only authenticated users can read files in their upload directory
+      // Editors and admins can read any uploads
+      allow read: if isAuthenticated() &&
+                     (
+                       (request.auth.uid == userId && isActiveUser()) ||
+                       isEditorOrAdmin()
+                     );
+      
+      // Users can upload to their own directory
+      // Editors and admins can upload to any directory
+      allow write: if isAuthenticated() &&
+                      hasValidFilename() &&
+                      (
+                        // Users uploading to their own directory
+                        (request.auth.uid == userId && 
+                         isActiveUser() &&
+                         ((isValidImageType() && isValidImageSize()) ||
+                          (isValidDocumentType() && isValidDocumentSize()))) ||
+                        // Editors can upload anywhere
+                        (isEditorOrAdmin() &&
+                         ((isValidImageType() && isValidImageSize()) ||
+                          (isValidDocumentType() && isValidDocumentSize())))
+                      );
+      
+      // Users can delete their own uploads, admins can delete any
+      allow delete: if isAuthenticated() &&
+                       (
+                         (request.auth.uid == userId && isActiveUser()) ||
+                         isAdmin()
+                       );
+    }
+    
+    // ============================================================================
+    // TEMPORARY UPLOADS (24h Auto-cleanup)
+    // ============================================================================
+    
+    match /temp/{userId}/{fileName} {
+      // Only the user can read their temporary files
+      allow read: if isAuthenticated() &&
+                     request.auth.uid == userId &&
+                     isActiveUser();
+      
+      // Users can upload to their temporary directory
+      allow write: if isAuthenticated() &&
+                      request.auth.uid == userId &&
+                      isActiveUser() &&
+                      hasValidFilename() &&
+                      ((isValidImageType() && isValidImageSize()) ||
+                       (isValidDocumentType() && isValidDocumentSize()));
+      
+      // Users can delete their own temporary files
+      // System/Cloud Functions can also delete (for cleanup)
+      allow delete: if isAuthenticated() &&
+                       (
+                         (request.auth.uid == userId && isActiveUser()) ||
+                         isAdmin()
+                       );
+    }
+    
+    // ============================================================================
+    // SANITY CMS ASSETS (If stored in Firebase Storage)
+    // ============================================================================
+    
+    match /sanity-assets/{assetType}/{assetId} {
+      // Public read access for Sanity assets
+      allow read: if true;
+      
+      // Only admins can manage Sanity assets in Firebase Storage
+      // (Usually Sanity manages its own asset storage)
+      allow write, delete: if isAdmin() &&
+                              hasValidFilename() &&
+                              ((isValidImageType() && isValidImageSize()) ||
+                               (isValidDocumentType() && isValidDocumentSize()));
+    }
+    
+    // ============================================================================
+    // SYSTEM/BACKUP FILES
+    // ============================================================================
+    
+    match /system/{path=**} {
+      // Only admins can access system files
+      allow read, write, delete: if isAdmin();
+    }
+    
+    match /backups/{path=**} {
+      // Only admins can access backup files
+      allow read, write, delete: if isAdmin();
+    }
+    
+    // ============================================================================
+    // CONTENT EXPORTS (For Sanity Integration)
+    // ============================================================================
+    
+    match /exports/{exportType}/{fileName} {
+      // Editors and admins can read exports
+      allow read: if isEditorOrAdmin();
+      
+      // Only admins can create/delete exports
+      allow write, delete: if isAdmin() &&
+                              hasValidFilename() &&
+                              (isValidDocumentType() && isValidDocumentSize());
+    }
+    
+    // ============================================================================
+    // PUBLIC ASSETS (Open Access)
+    // ============================================================================
+    
+    match /public/{path=**} {
+      // Public read access for shared assets
+      allow read: if true;
+      
+      // Only admins can manage public assets
+      allow write, delete: if isAdmin() &&
+                              ((isValidImageType() && isValidImageSize()) ||
+                               (isValidDocumentType() && isValidDocumentSize()));
+    }
+    
+    // ============================================================================
+    // CATCH-ALL RULE (Deny by default)
+    // ============================================================================
+    
+    // Deny access to any paths not explicitly defined above
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

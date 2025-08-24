@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Custom styles that extend Tailwind */
+.shadow-top {
+  box-shadow: 0 -1px 3px 0 rgb(0 0 0 / 0.1), 0 -1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+@media (min-width: 1024px) {
+  .nav-item-hover {
+    position: relative;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .nav-item-hover::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 50%;
+    background-color: #0d9488;
+    transition: all 0.2s ease-in-out;
+    transform: translateX(-50%);
+  }
+  
+  .nav-item-hover:hover::after {
+    width: 100%;
+  }
+}
+
+/* User Profile Styles */
+#user-avatar,
+#user-avatar-blog,
+#tablet-user-avatar,
+#mobile-user-avatar {
+  transition: transform 0.2s ease-in-out;
+}
+
+#user-avatar:hover,
+#user-avatar-blog:hover,
+#tablet-user-avatar:hover,
+#mobile-user-avatar:hover {
+  transform: scale(1.05);
+}
+
+/* Profile Blog Link Styles */
+#profile-blog-link:hover #user-avatar-blog,
+#tablet-profile-blog-link:hover #tablet-user-avatar {
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.3);
+}
+
+#mobile-profile-blog-link:hover {
+  background-color: rgba(13, 148, 136, 0.1);
+}
+
+#user-dropdown {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Message notification styles */
+.message-notification {
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 1024px) {
+  #mobile-menu {
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  }
+  #mobile-menu.hidden {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  #mobile-menu {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
