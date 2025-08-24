@@ -140,18 +140,25 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         try {
             isSigningUp = true;
+            console.log('Starting email signup process...');
             
-            // Create user account
+            // Step 1: Create user account
+            console.log('Creating user account with email:', email);
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            console.log('User account created successfully:', user.uid);
             
-            // Update profile with user's name
+            // Step 2: Update profile with user's name
+            console.log('Updating user profile...');
             await updateProfile(user, {
                 displayName: `${firstName} ${lastName}`
             });
+            console.log('Profile updated successfully');
             
-            // Create user profile in Firestore
+            // Step 3: Create user profile in Firestore
+            console.log('Creating Firestore profile...');
             await createUserProfile(user, firstName, lastName, db);
+            console.log('Firestore profile created successfully');
             
             showSuccess('Account created successfully! Redirecting...');
             
@@ -161,7 +168,12 @@ document.addEventListener('DOMContentLoaded', async function() {
             }, 2000);
             
         } catch (error) {
-            console.error('Signup error:', error);
+            console.error('Signup error at step:', error);
+            console.error('Full error details:', {
+                code: error.code,
+                message: error.message,
+                stack: error.stack
+            });
             showError(error);
         } finally {
             isSigningUp = false;

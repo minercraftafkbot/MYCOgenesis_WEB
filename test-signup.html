@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Signup Test</title>
+</head>
+<body>
+    <h1>Email Signup Test</h1>
+    <form id="testForm">
+        <input type="email" id="email" placeholder="Email" value="test@example.com">
+        <input type="password" id="password" placeholder="Password" value="test123">
+        <button type="submit">Test Signup</button>
+    </form>
+    <div id="result"></div>
+
+    <!-- Environment Configuration -->
+    <script src="js/env-config.js"></script>
+    
+    <script type="module">
+        import { initializeModularFirebase } from './js/firebase-init.js';
+        import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const result = document.getElementById('result');
+            
+            try {
+                console.log('Testing email signup...');
+                const firebaseServices = await initializeModularFirebase();
+                const { auth } = firebaseServices;
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                console.log('Attempting to create user:', email);
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                result.innerHTML = `<p style="color: green;">Success! User created: ${userCredential.user.uid}</p>`;
+                console.log('User created successfully:', userCredential.user.uid);
+                
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Error: ${error.code} - ${error.message}</p>`;
+                console.error('Signup test error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
