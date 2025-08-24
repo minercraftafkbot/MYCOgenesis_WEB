@@ -424,9 +424,9 @@ class UIStateManager {
    */
   createCardGridSkeleton() {
     return `
-      <div class="animate-pulse grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="animate-pulse flex flex-wrap justify-center gap-6">
         ${Array(3).fill().map(() => `
-          <div class="border rounded-lg overflow-hidden">
+          <div class="border rounded-lg overflow-hidden w-full max-w-sm">
             <div class="h-48 bg-slate-200"></div>
             <div class="p-4">
               <div class="h-6 bg-slate-200 rounded mb-2"></div>

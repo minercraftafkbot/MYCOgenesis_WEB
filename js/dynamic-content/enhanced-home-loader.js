@@ -196,7 +196,7 @@ class EnhancedHomeLoader {
     const productUrl = this.getProductUrl(product);
 
     return `
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group w-full max-w-sm">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 
@@ -358,7 +358,7 @@ class EnhancedHomeLoader {
     const productUrl = this.getProductUrl(product);
 
     return `
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group">
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group w-full max-w-sm">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 
@@ -517,7 +517,7 @@ class EnhancedHomeLoader {
     const authorName = post.author?.name || 'MYCOgenesis Team';
 
     return `
-      <div class="bg-stone-50 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 group">
+      <div class="bg-stone-50 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 group w-full max-w-sm">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 

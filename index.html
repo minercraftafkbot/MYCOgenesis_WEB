@@ -589,7 +589,7 @@
           <div id="products-error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
 
           <!-- Products grid - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div class="flex flex-wrap justify-center gap-6 lg:gap-8">
             <!-- Only 3 products will be loaded dynamically -->
           </div>
         </div>
@@ -770,7 +770,7 @@
           <div id="shop-error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
 
           <!-- Shop products grid - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div class="flex flex-wrap justify-center gap-6 lg:gap-8">
             <!-- Shop products will be loaded dynamically -->
           </div>
           
@@ -790,7 +790,7 @@
         <div class="container mx-auto px-6">
           <h2 class="text-3xl font-bold text-center mb-12">From the Blog</h2>
           <!-- Blog grid - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div class="flex flex-wrap justify-center gap-6 lg:gap-8">
             <!-- Dynamic blog posts will be loaded here -->
           </div>
           <div class="text-center">
@@ -1066,6 +1066,9 @@
     </script>
 
 
+    <!-- TEMPORARY: Environment Variable Injection -->
+    <script src="js/temp-env-injector.js"></script>
+    
     <!-- Shared Authentication System -->
     <script type="module">
       import { SharedAuthHandler } from "./js/shared-auth.js";
