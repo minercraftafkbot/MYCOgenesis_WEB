@@ -85,29 +85,30 @@ class EnvironmentLoader {
      * Load development defaults (when no env vars are available)
      */
     loadDevelopmentDefaults() {
+        console.error('❌ SECURITY WARNING: No environment variables configured!');
+        console.error('🔧 Please create a .env file with your Firebase configuration.');
+        console.error('📖 See .env.example for the required variables.');
+        
+        // Don't provide any defaults - force proper configuration
         this.config = {
-            // Firebase Configuration (development)
-            FIREBASE_API_KEY: 'AIzaSyA8ustH6URtqM5S4F_IUszDBpiflel3utI',
-            FIREBASE_AUTH_DOMAIN: 'mycogen-57ade.firebaseapp.com',
-            FIREBASE_DATABASE_URL: 'https://mycogen-57ade-default-rtdb.firebaseio.com',
-            FIREBASE_PROJECT_ID: 'mycogen-57ade',
-            FIREBASE_STORAGE_BUCKET: 'mycogen-57ade.firebasestorage.app',
-            FIREBASE_MESSAGING_SENDER_ID: '987955981851',
-            FIREBASE_APP_ID: '1:987955981851:web:780126aeac499bf0d512be',
-            FIREBASE_MEASUREMENT_ID: 'G-S0KN75E7HZ',
-
-            // Application Settings
+            // Application Settings (non-sensitive only)
             APP_NAME: 'MYCOgenesis',
             APP_URL: window.location.origin,
             ENVIRONMENT: 'development',
             DEBUG_MODE: 'true',
 
-            // Sanity CMS (will need to be configured)
-            SANITY_PROJECT_ID: 'your-sanity-project-id',
+            // Sanity CMS (non-sensitive defaults)
             SANITY_DATASET: 'production',
             SANITY_API_VERSION: '2023-12-01',
             SANITY_USE_CDN: 'true'
         };
+        
+        // Throw error for missing Firebase config
+        throw new Error(
+            'Firebase configuration is required but not found. ' +
+            'Please create a .env file with your Firebase credentials. ' +
+            'See .env.example for template.'
+        );
     }
 
     /**
