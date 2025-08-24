@@ -584,10 +584,13 @@ class EnhancedHomeLoader {
 
     // Preload content on hover
     document.addEventListener('mouseenter', (event) => {
-      const productLink = event.target.closest('[data-product-id]');
-      if (productLink && this.enhancedCoordinator) {
-        // Preload product content if available
-        console.log('Preloading product content...');
+      // Check if event.target is an Element before using closest()
+      if (event.target && event.target.nodeType === Node.ELEMENT_NODE && typeof event.target.closest === 'function') {
+        const productLink = event.target.closest('[data-product-id]');
+        if (productLink && this.enhancedCoordinator) {
+          // Preload product content if available
+          console.log('Preloading product content...');
+        }
       }
     }, true);
   }
