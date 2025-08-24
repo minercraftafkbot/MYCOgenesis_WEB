@@ -69,8 +69,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 code: error.code,
                 message: error.message,
                 userUID: user.uid,
-                userEmail: user.email,
-                profileData: userProfile
+                userEmail: user.email
             });
             
             if (error.code === 'permission-denied') {
