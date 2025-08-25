@@ -4,7 +4,6 @@
  */
 
 import { sanityService } from '../services/sanity-service.js';
-import { publicContentService } from '../services/public-content-service.js';
 
 export class BlogLoader {
     constructor() {
@@ -15,6 +14,11 @@ export class BlogLoader {
         this.currentCategory = '';
         this.currentSort = 'latest';
         this.searchTerm = '';
+        
+        // DOM Elements
+        this.blogPostsGrid = null;
+        this.loadingSpinner = null;
+        this.errorMessage = null;
         this.filters = {
             categoryFilter: null,
             sortFilter: null,
@@ -28,16 +32,120 @@ export class BlogLoader {
      */
     async initialize() {
         try {
-            // Initialize filters
-            await this.initializeFilters();
-            // Load content
+            console.log('🔄 Initializing blog loader components...');
+            
+            // Get required DOM elements
+            this.blogPostsGrid = document.getElementById('blog-posts-grid');
+            this.loadingSpinner = document.getElementById('loading-spinner');
+            this.errorMessage = document.getElementById('error-message');
+            
+            // Get filter elements
+            this.filters.categoryFilter = document.getElementById('category-filter');
+            this.filters.sortFilter = document.getElementById('sort-filter');
+            this.filters.searchFilter = document.getElementById('search-filter');
+
+            // Load initial content
             await this.loadFeaturedPost();
             await this.loadLatestPosts();
+            
+            // Initialize filters and event listeners
+            await this.initializeFilters();
             this.setupEventListeners();
+            
+            console.log('✅ Blog loader fully initialized');
         } catch (error) {
             console.error('Error initializing blog loader:', error);
             this.showErrorMessage('Failed to load blog content');
         }
+    }
+
+    /**
+     * Initialize filters with data from Sanity
+     * @returns {Promise<void>}
+     */
+    async initializeFilters() {
+        try {
+            console.log('🔄 Initializing blog filters...');
+            
+            // Only proceed if we have the category filter
+            if (!this.filters.categoryFilter) {
+                console.log('⚠️ Category filter element not found, skipping filter initialization');
+                return;
+            }
+
+            // Load categories from Sanity
+            const categories = await sanityService.getCategories();
+            
+            // Clear existing options except "All Categories"
+            while (this.filters.categoryFilter.children.length > 1) {
+                this.filters.categoryFilter.removeChild(this.filters.categoryFilter.lastChild);
+            }
+
+            // Add categories
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.slug?.current || '';
+                option.textContent = category.name;
+                this.filters.categoryFilter.appendChild(option);
+            });
+
+            console.log(`✅ Initialized filters with ${categories.length} categories`);
+        } catch (error) {
+            console.error('Error initializing filters:', error);
+            // Don't throw error, just log it - the blog should still work without filters
+        }
+    }
+
+    /**
+     * Set up event listeners
+     */
+    setupEventListeners() {
+        // Infinite scroll
+        window.addEventListener('scroll', () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 1000) {
+                this.loadMorePosts();
+            }
+        });
+
+        // Category filter
+        if (this.filters.categoryFilter) {
+            this.filters.categoryFilter.addEventListener('change', async () => {
+                this.currentCategory = this.filters.categoryFilter.value;
+                this.resetAndReload();
+            });
+        }
+
+        // Sort filter
+        if (this.filters.sortFilter) {
+            this.filters.sortFilter.addEventListener('change', async () => {
+                this.currentSort = this.filters.sortFilter.value;
+                this.resetAndReload();
+            });
+        }
+
+        // Search filter with debounce
+        if (this.filters.searchFilter) {
+            let debounceTimer;
+            this.filters.searchFilter.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    this.searchTerm = this.filters.searchFilter.value;
+                    this.resetAndReload();
+                }, 500);
+            });
+        }
+    }
+
+    /**
+     * Reset page and reload posts
+     */
+    async resetAndReload() {
+        this.currentPage = 1;
+        this.hasMorePosts = true;
+        if (this.blogPostsGrid) {
+            this.blogPostsGrid.innerHTML = '';
+        }
+        await this.loadLatestPosts();
     }
 
     /**
@@ -46,99 +154,44 @@ export class BlogLoader {
      */
     async loadFeaturedPost() {
         try {
-            // Try Sanity first
-            let featuredPosts = await sanityService.getBlogPosts({
+            const featuredPosts = await sanityService.getBlogPosts({
                 featured: true,
                 limit: 1
             });
 
             if (featuredPosts.length > 0) {
                 this.renderFeaturedPost(featuredPosts[0]);
-            } else {
-                // Fallback to latest post if no featured post
-                const latestPosts = await sanityService.getBlogPosts({ limit: 1 });
-                if (latestPosts.length > 0) {
-                    this.renderFeaturedPost(latestPosts[0]);
-                } else {
-                    console.log('No blog posts found in Sanity, trying Firestore fallback');
-                    // Final fallback to Firestore
-                    const fireStorePosts = await publicContentService.getPublishedBlogPosts({ limit: 1 });
-                    if (fireStorePosts.length > 0) {
-                        this.renderFeaturedPost(fireStorePosts[0]);
-                    }
-                }
             }
         } catch (error) {
             console.error('Error loading featured post:', error);
-            console.log('Trying Firestore fallback for featured post');
-            // Final fallback to Firestore
-            try {
-                const fireStorePosts = await publicContentService.getPublishedBlogPosts({ limit: 1 });
-                if (fireStorePosts.length > 0) {
-                    this.renderFeaturedPost(fireStorePosts[0]);
-                }
-            } catch (fallbackError) {
-                console.error('Featured post fallback also failed:', fallbackError);
-            }
         }
     }
 
     /**
      * Load and display latest blog posts
-     * @param {boolean} append - Whether to append to existing posts or replace
      * @returns {Promise<void>}
      */
-    async loadLatestPosts(append = false) {
-        if (this.isLoading) return;
+    async loadLatestPosts() {
+        if (this.isLoading || !this.hasMorePosts) return;
 
         this.isLoading = true;
         this.showLoadingState();
 
         try {
-            const options = {
-                limit: this.postsPerPage,
-                page: this.currentPage,
+            const posts = await sanityService.getBlogPosts({
                 category: this.currentCategory,
+                search: this.searchTerm,
                 sort: this.currentSort,
-                search: this.searchTerm
-            };
+                page: this.currentPage,
+                limit: this.postsPerPage
+            });
 
-            let posts;
-            try {
-                // Try Sanity first
-                if (this.searchTerm) {
-                    // For now, use simple filtering for search since Sanity doesn't have built-in search
-                    const allPosts = await sanityService.getBlogPosts({ limit: 50 });
-                    const searchTerm = this.searchTerm.toLowerCase();
-                    posts = allPosts.filter(post => 
-                        post.title.toLowerCase().includes(searchTerm) ||
-                        post.excerpt?.toLowerCase().includes(searchTerm) ||
-                        (post.categories && post.categories.some(cat => cat.toLowerCase().includes(searchTerm)))
-                    ).slice(0, this.postsPerPage);
-                } else {
-                    posts = await sanityService.getBlogPosts(options);
-                }
-
-                console.log(`✅ Loaded ${posts.length} blog posts from Sanity CMS`);
-            } catch (sanityError) {
-                console.warn('Sanity CMS failed, trying Firestore fallback:', sanityError);
-                // Fallback to Firestore
-                if (this.searchTerm) {
-                    posts = await publicContentService.searchBlogPosts(this.searchTerm, this.postsPerPage);
-                } else {
-                    posts = await publicContentService.getPublishedBlogPosts(options);
-                }
-                console.log(`⚠️ Used Firestore fallback, loaded ${posts.length} posts`);
+            if (posts.length < this.postsPerPage) {
+                this.hasMorePosts = false;
             }
 
-            if (append) {
-                this.appendPosts(posts);
-            } else {
-                this.renderLatestPosts(posts);
-            }
-
-            this.hasMorePosts = posts.length === this.postsPerPage;
-            this.updateLoadMoreButton();
+            this.renderPosts(posts);
+            this.currentPage++;
 
         } catch (error) {
             console.error('Error loading latest posts:', error);
@@ -150,210 +203,78 @@ export class BlogLoader {
     }
 
     /**
-     * Render featured post
+     * Load more posts for infinite scroll
+     */
+    async loadMorePosts() {
+        if (!this.isLoading && this.hasMorePosts) {
+            await this.loadLatestPosts();
+        }
+    }
+
+    /**
+     * Render featured blog post
      * @param {Object} post - Featured blog post
      */
     renderFeaturedPost(post) {
-        const featuredSection = document.querySelector('#featured-post-section');
+        const featuredSection = document.getElementById('featured-post-section');
         if (!featuredSection) return;
 
-        const imageUrl = post.featuredImage?.url || 'https://images.unsplash.com/photo-1616597082843-a72175a3de38?q=80&w=800&auto=format&fit=crop';
-        const imageAlt = post.featuredImage?.alt || post.title;
-        const publishedDate = this.formatDate(post.publishedAt);
-        const postUrl = this.generatePostUrl(post);
-
+        const imageUrl = post.mainImage ? sanityService.urlFor(post.mainImage).width(1200).url() : 'images/default-featured.jpg';
+        
         featuredSection.innerHTML = `
             <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold mb-8">Featured Post</h2>
-                <a href="${postUrl}" class="block group">
-                    <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center bg-white rounded-lg shadow-lg overflow-hidden">
-                        <img src="${imageUrl}" alt="${imageAlt}" class="w-full h-80 object-cover">
-                        <div class="p-8">
-                            <span class="text-sm font-semibold text-teal-600 uppercase">${post.category || 'Blog'}</span>
-                            <h3 class="text-2xl md:text-3xl font-bold mt-2 mb-4 group-hover:text-teal-700 transition-colors">${post.title}</h3>
-                            <p class="text-slate-600 mb-4">${post.excerpt}</p>
-                            <p class="font-semibold text-slate-800">By ${post.author?.name || 'MYCOgenesis Team'} • ${publishedDate}</p>
+                <a href="blog-post.html?slug=${post.slug.current}" class="block group">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 group-hover:scale-[1.02]">
+                        <div class="relative">
+                            <img src="${imageUrl}" alt="${post.title}" class="w-full h-96 object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 right-0 p-8 text-white">
+                                <span class="text-teal-400 text-sm font-semibold uppercase">${post.category?.name || 'Featured'}</span>
+                                <h2 class="text-3xl font-bold mt-2 mb-3 group-hover:text-teal-400 transition-colors">${post.title}</h2>
+                                <p class="text-slate-200 line-clamp-2">${post.excerpt}</p>
+                            </div>
                         </div>
                     </div>
                 </a>
-            </div>
-        `;
+            </div>`;
     }
 
     /**
-     * Render latest posts grid
+     * Render blog posts
      * @param {Array} posts - Array of blog posts
      */
-    renderLatestPosts(posts) {
-        const postsGrid = document.querySelector('#blog-posts');
-        if (!postsGrid) return;
+    renderPosts(posts) {
+        if (!this.blogPostsGrid || !posts.length) return;
 
-        if (posts.length === 0) {
-            postsGrid.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <div class="text-6xl mb-4">📝</div>
-                    <h3 class="text-xl font-semibold text-slate-800 mb-2">No Posts Found</h3>
-                    <p class="text-slate-600">Check back later for new posts</p>
-                </div>
-            `;
-            this.toggleLoadMore(false);
-            return;
-        }
-
-        postsGrid.innerHTML = posts.map(post => this.renderPostCard(post)).join('');
-        this.toggleLoadMore(this.hasMorePosts);
-    }
-
-    /**
-     * Append posts to existing grid
-     * @param {Array} posts - Array of blog posts to append
-     */
-    appendPosts(posts) {
-        const postsGrid = document.querySelector('#blog-posts');
-        if (!postsGrid || posts.length === 0) return;
-
-        const postsHTML = posts.map(post => this.renderPostCard(post)).join('');
-        postsGrid.insertAdjacentHTML('beforeend', postsHTML);
-        this.toggleLoadMore(this.hasMorePosts);
-    }
-
-    /**
-     * Render individual post card
-     * @param {Object} post - Blog post object
-     * @returns {string} - HTML string for post card
-     */
-    renderPostCard(post) {
-        const imageUrl = post.featuredImage?.url || 'https://images.unsplash.com/photo-1604313324216-a7c751e7dd1e?q=80&w=600&auto=format&fit=crop';
-        const imageAlt = post.featuredImage?.alt || post.title;
-        const publishedDate = this.formatDate(post.publishedAt);
-        const postUrl = this.generatePostUrl(post);
-
-        return `
-            <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105">
-                <a href="${postUrl}" class="block">
-                    <img src="${imageUrl}" alt="${imageAlt}" class="w-full h-56 object-cover">
-                    <div class="p-6">
-                        <span class="text-sm font-semibold text-teal-600 uppercase">${post.category || 'Blog'}</span>
-                        <h3 class="font-bold text-xl my-2">${post.title}</h3>
-                        <p class="text-slate-600 text-sm mb-4">${post.excerpt}</p>
-                        <p class="text-xs text-slate-500">By ${post.author?.name || 'MYCOgenesis Team'} • ${publishedDate}</p>
-                    </div>
-                </a>
-            </div>
-        `;
-    }
-
-    /**
-     * Generate post URL
-     * @param {Object} post - Blog post object
-     * @returns {string} - Post URL
-     */
-    generatePostUrl(post) {
-        // For now, use blog-post.html with post ID as parameter
-        // In a real implementation, you might use the slug for SEO-friendly URLs
-        return `blog-post.html?slug=${post.slug}`;
-    }
-
-    /**
-     * Format date for display
-     * @param {Date|string} date - Date to format
-     * @returns {string} - Formatted date string
-     */
-    formatDate(date) {
-        if (!date) return '';
-        
-        const dateObj = date instanceof Date ? date : new Date(date);
-        return dateObj.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    }
-
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners() {
-        // Load more button
-        const loadMoreBtn = document.querySelector('#load-more-posts');
-        if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', () => {
-                this.currentPage++;
-                this.loadLatestPosts(true);
+        const postsHTML = posts.map(post => {
+            const imageUrl = post.mainImage ? sanityService.urlFor(post.mainImage).width(600).url() : 'images/default-post.jpg';
+            const date = new Date(post.publishedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
-        }
 
-        // Category filter (if exists)
-        const categoryFilter = document.querySelector('#category-filter');
-        if (categoryFilter) {
-            categoryFilter.addEventListener('change', (e) => {
-                this.currentCategory = e.target.value || null;
-                this.currentPage = 1;
-                this.loadLatestPosts();
-            });
-        }
+            return `
+                <article class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
+                    <a href="blog-post.html?slug=${post.slug.current}" class="block">
+                        <img src="${imageUrl}" alt="${post.title}" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <span class="text-teal-600 text-sm font-semibold uppercase">${post.category?.name || 'Blog'}</span>
+                            <h3 class="font-bold text-xl mt-2 mb-3 text-slate-800 hover:text-teal-600 transition-colors">${post.title}</h3>
+                            <p class="text-slate-600 mb-4 line-clamp-2">${post.excerpt}</p>
+                            <div class="flex items-center justify-between text-sm text-slate-500">
+                                <span>${date}</span>
+                                <span class="text-teal-600 font-medium">Read More →</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>`;
+        }).join('');
 
-        // Search functionality (if exists)
-        const searchInput = document.querySelector('#blog-search');
-        const searchBtn = document.querySelector('#blog-search-btn');
-        
-        if (searchInput && searchBtn) {
-            const performSearch = () => {
-                this.searchTerm = searchInput.value.trim() || null;
-                this.currentPage = 1;
-                this.loadLatestPosts();
-            };
-
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-        }
-
-        // Real-time content updates
-        window.addEventListener('blogContentUpdated', (event) => {
-            const { posts, changes } = event.detail;
-            this.handleRealTimeUpdates(posts, changes);
-        });
-    }
-
-    /**
-     * Handle real-time content updates
-     * @param {Array} posts - Updated posts array
-     * @param {Array} changes - Firestore document changes
-     */
-    handleRealTimeUpdates(posts, changes) {
-        // Only update if we're on the first page and not searching/filtering
-        if (this.currentPage === 1 && !this.searchTerm && !this.currentCategory) {
-            // Check if there are new posts or significant changes
-            const hasNewPosts = changes.some(change => change.type === 'added');
-            const hasModifiedPosts = changes.some(change => change.type === 'modified');
-            
-            if (hasNewPosts || hasModifiedPosts) {
-                // Reload the latest posts to show updates
-                this.loadLatestPosts();
-                
-                // Update featured post if it might have changed
-                this.loadFeaturedPost();
-            }
-        }
-    }
-
-    /**
-     * Update load more button state
-     */
-    updateLoadMoreButton() {
-        const loadMoreBtn = document.querySelector('#load-more-posts');
-        if (!loadMoreBtn) return;
-
-        if (this.hasMorePosts) {
-            loadMoreBtn.style.display = 'block';
-            loadMoreBtn.disabled = false;
-            loadMoreBtn.textContent = 'Load More Posts';
+        if (this.currentPage === 1) {
+            this.blogPostsGrid.innerHTML = postsHTML;
         } else {
-            loadMoreBtn.style.display = 'none';
+            this.blogPostsGrid.insertAdjacentHTML('beforeend', postsHTML);
         }
     }
 
@@ -361,16 +282,8 @@ export class BlogLoader {
      * Show loading state
      */
     showLoadingState() {
-        const loadMoreBtn = document.querySelector('#load-more-button');
-        const loadingState = document.querySelector('#loading-state');
-
-        if (loadMoreBtn) {
-            loadMoreBtn.disabled = true;
-            loadMoreBtn.textContent = 'Loading...';
-        }
-
-        if (loadingState) {
-            loadingState.classList.remove('hidden');
+        if (this.loadingSpinner) {
+            this.loadingSpinner.classList.remove('hidden');
         }
     }
 
@@ -378,16 +291,8 @@ export class BlogLoader {
      * Hide loading state
      */
     hideLoadingState() {
-        const loadMoreBtn = document.querySelector('#load-more-button');
-        const loadingState = document.querySelector('#loading-state');
-
-        if (loadMoreBtn) {
-            loadMoreBtn.disabled = false;
-            loadMoreBtn.textContent = 'Load More Posts';
-        }
-
-        if (loadingState) {
-            loadingState.classList.add('hidden');
+        if (this.loadingSpinner) {
+            this.loadingSpinner.classList.add('hidden');
         }
     }
 
@@ -396,29 +301,9 @@ export class BlogLoader {
      * @param {string} message - Error message to display
      */
     showErrorMessage(message) {
-        const errorContainer = document.querySelector('#error-message');
-        if (errorContainer) {
-            errorContainer.textContent = message;
-            errorContainer.classList.remove('hidden');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                errorContainer.classList.add('hidden');
-            }, 5000);
-        } else {
-            console.error(message);
+        if (this.errorMessage) {
+            this.errorMessage.textContent = message;
+            this.errorMessage.classList.remove('hidden');
         }
     }
 }
-
-// Auto-initialize if on blog page
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.location.pathname.includes('blog.html') || 
-        document.querySelector('#latest-posts-grid')) {
-        const blogLoader = new BlogLoader();
-        blogLoader.initialize();
-        
-        // Make available globally for debugging
-        window.blogLoader = blogLoader;
-    }
-});

@@ -22,6 +22,7 @@ window.ENV_CONFIG = {
     DEBUG_MODE: 'false',
     
     // Sanity CMS Configuration
+    SANITY_PROJECT_ID: 'gae98lpg',
     SANITY_DATASET: 'production',
     SANITY_API_VERSION: '2023-12-01',
     SANITY_USE_CDN: 'true'
