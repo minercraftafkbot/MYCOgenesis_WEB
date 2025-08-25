@@ -35,6 +35,43 @@ class SanityService {
     }
 
     /**
+     * Get blog posts with filters
+     * @param {Object} options - Query options
+     * @param {boolean} options.featured - Filter by featured status
+     * @param {string} options.category - Filter by category
+     * @param {string} options.search - Search term
+     * @param {number} options.page - Page number
+     * @param {number} options.limit - Results per page
+     * @returns {Promise<Array>} - Blog posts array
+     */
+    async getBlogPosts({ featured = false, category = null, search = null, page = 1, limit = 6 } = {}) {
+        try {
+            let filters = ['_type == "blogPost"'];
+            if (featured) filters.push('isFeatured == true');
+            if (category) filters.push(`category->slug.current == "${category}"`);
+            if (search) filters.push(`(title match "*${search}*" || excerpt match "*${search}*")`);
+
+            const query = `*[${filters.join(' && ')}] | order(publishedAt desc) [${(page - 1) * limit}...${page * limit}] {
+                _id,
+                title,
+                slug,
+                excerpt,
+                mainImage,
+                publishedAt,
+                category->,
+                author->,
+                isFeatured,
+                content[]
+            }`;
+
+            return await this.client.fetch(query);
+        } catch (error) {
+            console.error('Failed to get blog posts:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get featured products for homepage
      * @param {number} limit - Maximum number of products
      * @returns {Promise<Array>} - Featured products array
@@ -301,7 +338,7 @@ class SanityService {
         return {
             ...post,
             slug: post.slug?.current,
-            featuredImage: post.featuredImage ? {
+            featuredImage: post.featuredImage?.asset ? {
                 ...post.featuredImage,
                 url: this.urlFor(post.featuredImage.asset).width(1200).height(630).format('webp').url()
             } : null,
