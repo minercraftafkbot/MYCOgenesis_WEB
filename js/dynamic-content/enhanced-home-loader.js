@@ -4,13 +4,15 @@
  */
 
 import { publicContentService } from '../services/public-content-service.js';
+import { sanityService } from '../services/sanity-service.js';
 
-class EnhancedHomeLoader {
+export class EnhancedHomeLoader {
   constructor() {
     this.isLoading = false;
     this.enhancedCoordinator = null;
     this.uiStateManager = null;
     this.seoManager = null;
+    this.sanityService = sanityService;
   }
 
   /**
@@ -125,41 +127,90 @@ class EnhancedHomeLoader {
    * Fetch featured products using enhanced coordinator or fallback
    */
   async fetchFeaturedProducts() {
-    // Try to use enhanced coordinator first
-    if (this.enhancedCoordinator) {
-      try {
-        // Check if we can preload from Sanity
-        const sanityService = window.sanityService;
-        if (sanityService) {
-          const query = `*[_type == "product" && featured == true] | order(priority desc, _createdAt desc)[0...3] {
-            _id,
-            name,
-            slug,
-            description,
-            shortDescription,
-            featuredImage {
-              asset-> {
-                _id,
-                url
-              },
-              alt
-            },
-            availability,
-            price,
-            category,
-            featured,
-            priority
-          }`;
-          
-          return await sanityService.fetch(query);
-        }
-      } catch (error) {
-        console.warn('Sanity products not available, using Firestore fallback:', error);
-      }
+    try {
+      const products = await this.sanityService.getFeaturedProducts(3);
+      return products.map(product => ({
+        id: product._id,
+        name: product.name,
+        description: product.shortDescription || product.description,
+        image: product.images && product.images.length > 0 
+          ? this.sanityService.urlFor(product.images[0]).url() 
+          : 'images/product-placeholder.jpg',
+        price: product.price,
+        slug: product.slug.current,
+        category: product.category?.name || 'Mushroom',
+        status: product.availability || 'in-stock'
+      }));
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      // Fallback to public content service
+      return await publicContentService.getFeaturedProducts();
     }
-    
-    // Fallback to existing Firestore service
-    return await publicContentService.getFeaturedProducts(3);
+  }
+
+  /**
+   * Fetch latest blog posts using Sanity
+   */
+  async fetchLatestBlogPosts() {
+    try {
+      const posts = await this.sanityService.getBlogPosts({
+        limit: 3,
+        page: 1
+      });
+      
+      return posts.map(post => ({
+        id: post._id,
+        title: post.title,
+        excerpt: post.excerpt,
+        image: post.mainImage 
+          ? this.sanityService.urlFor(post.mainImage).url() 
+          : 'images/blog-placeholder.jpg',
+        slug: post.slug.current,
+        category: post.category?.title || 'Mycology',
+        author: post.author?.name || 'MYCOgenesis Team',
+        date: new Date(post.publishedAt).toLocaleDateString()
+      }));
+    } catch (error) {
+      console.error('Error fetching latest blog posts:', error);
+      // Fallback to public content service
+      return await publicContentService.getLatestPosts();
+    }
+  }
+  /**
+   * Load featured products section
+   */
+  async loadFeaturedProducts() {
+    try {
+      const products = await this.fetchFeaturedProducts();
+      this.renderFeaturedProducts(products);
+    } catch (error) {
+      console.error('Error loading featured products:', error);
+      this.showProductsError('Failed to load featured products');
+    }
+  }
+
+  /**
+   * Fetch featured products using Sanity
+   */
+  async fetchFeaturedProducts() {
+    try {
+      const products = await this.sanityService.getFeaturedProducts(3);
+      return products.map(product => ({
+        id: product._id,
+        name: product.name,
+        description: product.shortDescription || product.description,
+        image: product.images && product.images.length > 0 
+          ? this.sanityService.urlFor(product.images[0]).url() 
+          : 'images/product-placeholder.jpg',
+        price: product.price || 0,
+        slug: product.slug.current,
+        category: product.category?.name || 'Mushroom',
+        status: product.availability || 'in-stock'
+      }));
+    } catch (error) {
+      console.warn('Sanity products not available, using fallback:', error);
+      return await publicContentService.getFeaturedProducts(3);
+    }
   }
 
   /**
@@ -167,7 +218,7 @@ class EnhancedHomeLoader {
    */
   renderFeaturedProducts(products) {
     const container = document.querySelector('#featured-products .grid');
-    if (!container || !products) return;
+    if (!container) return;
 
     if (products.length === 0) {
       container.innerHTML = `
