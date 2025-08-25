@@ -173,19 +173,23 @@ export class BlogLoader {
      * @param {Array} posts - Array of blog posts
      */
     renderLatestPosts(posts) {
-        const postsGrid = document.querySelector('#latest-posts-grid');
+        const postsGrid = document.querySelector('#blog-posts');
         if (!postsGrid) return;
 
         if (posts.length === 0) {
             postsGrid.innerHTML = `
                 <div class="col-span-full text-center py-12">
-                    <p class="text-slate-600 text-lg">No blog posts found.</p>
+                    <div class="text-6xl mb-4">📝</div>
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">No Posts Found</h3>
+                    <p class="text-slate-600">Check back later for new posts</p>
                 </div>
             `;
+            this.toggleLoadMore(false);
             return;
         }
 
         postsGrid.innerHTML = posts.map(post => this.renderPostCard(post)).join('');
+        this.toggleLoadMore(this.hasMorePosts);
     }
 
     /**
@@ -193,11 +197,12 @@ export class BlogLoader {
      * @param {Array} posts - Array of blog posts to append
      */
     appendPosts(posts) {
-        const postsGrid = document.querySelector('#latest-posts-grid');
+        const postsGrid = document.querySelector('#blog-posts');
         if (!postsGrid || posts.length === 0) return;
 
         const postsHTML = posts.map(post => this.renderPostCard(post)).join('');
         postsGrid.insertAdjacentHTML('beforeend', postsHTML);
+        this.toggleLoadMore(this.hasMorePosts);
     }
 
     /**
@@ -344,16 +349,16 @@ export class BlogLoader {
      * Show loading state
      */
     showLoadingState() {
-        const loadMoreBtn = document.querySelector('#load-more-posts');
+        const loadMoreBtn = document.querySelector('#load-more-button');
+        const loadingState = document.querySelector('#loading-state');
+
         if (loadMoreBtn) {
             loadMoreBtn.disabled = true;
             loadMoreBtn.textContent = 'Loading...';
         }
 
-        // Show loading spinner if exists
-        const loadingSpinner = document.querySelector('#loading-spinner');
-        if (loadingSpinner) {
-            loadingSpinner.classList.remove('hidden');
+        if (loadingState) {
+            loadingState.classList.remove('hidden');
         }
     }
 
@@ -361,9 +366,16 @@ export class BlogLoader {
      * Hide loading state
      */
     hideLoadingState() {
-        const loadingSpinner = document.querySelector('#loading-spinner');
-        if (loadingSpinner) {
-            loadingSpinner.classList.add('hidden');
+        const loadMoreBtn = document.querySelector('#load-more-button');
+        const loadingState = document.querySelector('#loading-state');
+
+        if (loadMoreBtn) {
+            loadMoreBtn.disabled = false;
+            loadMoreBtn.textContent = 'Load More Posts';
+        }
+
+        if (loadingState) {
+            loadingState.classList.add('hidden');
         }
     }
 

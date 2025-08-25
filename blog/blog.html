@@ -381,7 +381,21 @@
     <script type="module" src="../js/services/sanity-service.js"></script>
     
     <!-- Dynamic Content Loading -->
-    <script type="module" src="../js/dynamic-content/blog-loader.js"></script>
+    <script type="module">
+        import { BlogLoader } from '../js/dynamic-content/blog-loader.js';
+        
+        // Initialize blog loader when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔄 Initializing blog loader...');
+            try {
+                window.blogLoader = new BlogLoader();
+                await window.blogLoader.initialize();
+                console.log('✅ Blog loader initialized successfully');
+            } catch (error) {
+                console.error('❌ Failed to initialize blog loader:', error);
+            }
+        });
+    </script></script>
     <script type="module" src="../js/services/real-time-content-service.js"></script>
 </body>
 </html>
