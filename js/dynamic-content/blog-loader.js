@@ -12,8 +12,14 @@ export class BlogLoader {
         this.postsPerPage = 6;
         this.isLoading = false;
         this.hasMorePosts = true;
-        this.currentCategory = null;
-        this.searchTerm = null;
+        this.currentCategory = '';
+        this.currentSort = 'latest';
+        this.searchTerm = '';
+        this.filters = {
+            categoryFilter: null,
+            sortFilter: null,
+            searchFilter: null
+        };
     }
 
     /**
@@ -22,6 +28,9 @@ export class BlogLoader {
      */
     async initialize() {
         try {
+            // Initialize filters
+            await this.initializeFilters();
+            // Load content
             await this.loadFeaturedPost();
             await this.loadLatestPosts();
             this.setupEventListeners();
@@ -88,7 +97,10 @@ export class BlogLoader {
         try {
             const options = {
                 limit: this.postsPerPage,
-                category: this.currentCategory
+                page: this.currentPage,
+                category: this.currentCategory,
+                sort: this.currentSort,
+                search: this.searchTerm
             };
 
             let posts;

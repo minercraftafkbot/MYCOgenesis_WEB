@@ -72,6 +72,31 @@ class SanityService {
     }
 
     /**
+     * Get all blog categories
+     * @returns {Promise<Array>} - Categories array
+     */
+    async getCategories() {
+        try {
+            const query = `*[_type == "category"] | order(name asc) {
+                _id,
+                name,
+                slug,
+                description,
+                image {
+                    asset->{
+                        url
+                    }
+                }
+            }`;
+
+            return await this.client.fetch(query);
+        } catch (error) {
+            console.error('Failed to get categories:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get a single blog post by slug
      * @param {string} slug - Blog post slug
      * @returns {Promise<Object>} - Blog post object
