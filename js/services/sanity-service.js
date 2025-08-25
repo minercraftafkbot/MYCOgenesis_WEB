@@ -72,6 +72,52 @@ class SanityService {
     }
 
     /**
+     * Get a single blog post by slug
+     * @param {string} slug - Blog post slug
+     * @returns {Promise<Object>} - Blog post object
+     */
+    async getBlogPost(slug) {
+        try {
+            const query = `*[_type == "blogPost" && slug.current == "${slug}"][0] {
+                _id,
+                title,
+                slug,
+                excerpt,
+                mainImage,
+                publishedAt,
+                author->{
+                    name,
+                    image,
+                    bio
+                },
+                category->{
+                    title,
+                    description
+                },
+                content[] {
+                    ...,
+                    _type == "image" => {
+                        "url": asset->url,
+                        "metadata": asset->metadata
+                    },
+                    markDefs[] {
+                        ...,
+                        _type == "internalLink" => {
+                            "slug": @.reference->slug.current,
+                            "type": @.reference->_type
+                        }
+                    }
+                }
+            }`;
+
+            return await this.client.fetch(query);
+        } catch (error) {
+            console.error('Failed to get blog post:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get featured products for homepage
      * @param {number} limit - Maximum number of products
      * @returns {Promise<Array>} - Featured products array

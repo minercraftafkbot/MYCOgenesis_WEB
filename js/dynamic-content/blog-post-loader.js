@@ -1,8 +1,9 @@
 /**
  * Blog Post Content Loader
- * Dynamically loads and displays individual blog post content from Firestore
+ * Dynamically loads and displays individual blog post content from Sanity CMS
  */
 
+import { sanityService } from '../services/sanity-service.js';
 import { publicContentService } from '../services/public-content-service.js';
 
 export class BlogPostLoader {
@@ -24,12 +25,17 @@ export class BlogPostLoader {
                 return;
             }
 
+            // Update page title to loading state
+            document.title = 'Loading... - MYCOgenesis Blog';
+
             await this.loadBlogPost();
             await this.loadRelatedPosts();
             
         } catch (error) {
             console.error('Error initializing blog post loader:', error);
             this.showErrorMessage('Failed to load blog post');
+            // Update page title to error state
+            document.title = 'Error - MYCOgenesis Blog';
         }
     }
 
@@ -50,7 +56,8 @@ export class BlogPostLoader {
         try {
             this.showLoadingState();
 
-            const post = await publicContentService.getBlogPostBySlug(this.postSlug);
+            // Load from Sanity
+            const post = await sanityService.getBlogPost(this.postSlug);
             
             if (!post) {
                 this.showErrorMessage('Blog post not found');
@@ -59,9 +66,6 @@ export class BlogPostLoader {
 
             this.currentPost = post;
             this.renderBlogPost(post);
-            
-            // Increment view count
-            await publicContentService.incrementBlogPostViews(post.id);
             
             // Update page metadata
             this.updatePageMetadata(post);
@@ -109,17 +113,32 @@ export class BlogPostLoader {
      * @param {Object} post - Blog post object
      */
     updateArticleHeader(post) {
-        const headerElement = document.querySelector('article header');
-        if (!headerElement) return;
+        const categoryElement = document.getElementById('blog-post-category');
+        const titleElement = document.getElementById('blog-post-title');
+        const authorElement = document.getElementById('blog-post-author');
+        const dateElement = document.getElementById('blog-post-date');
 
-        const publishedDate = this.formatDate(post.publishedAt);
-        const category = post.category || 'Blog';
+        if (categoryElement) {
+            categoryElement.textContent = post.category || 'Blog';
+        }
 
-        headerElement.innerHTML = `
-            <span class="text-sm font-semibold text-teal-600 uppercase">${category}</span>
-            <h1 class="text-4xl md:text-5xl font-bold mt-2 mb-4">${post.title}</h1>
-            <p class="text-slate-500">By <span class="font-semibold text-slate-700">${post.author?.name || 'MYCOgenesis Team'}</span> • Published on ${publishedDate}</p>
-        `;
+        if (titleElement) {
+            titleElement.textContent = post.title;
+        }
+
+        if (authorElement) {
+            authorElement.textContent = post.author?.name || 'MYCOgenesis Team';
+        }
+
+        if (dateElement) {
+            dateElement.textContent = this.formatDate(post.publishedAt);
+        }
+
+        // Show content area
+        const contentArea = document.getElementById('blog-post-content');
+        if (contentArea) {
+            contentArea.classList.remove('hidden');
+        }
     }
 
     /**
@@ -127,10 +146,15 @@ export class BlogPostLoader {
      * @param {Object} post - Blog post object
      */
     updateArticleContent(post) {
-        const contentElement = document.querySelector('.prose');
+        const contentElement = document.getElementById('blog-post-body');
         if (!contentElement) return;
 
-        contentElement.innerHTML = post.content;
+        if (typeof post.content === 'string') {
+            contentElement.innerHTML = post.content;
+        } else {
+            // Handle Sanity portable text content
+            contentElement.innerHTML = this.formatPortableText(post.content);
+        }
     }
 
     /**
@@ -138,12 +162,13 @@ export class BlogPostLoader {
      * @param {Object} post - Blog post object
      */
     updateFeaturedImage(post) {
-        const imageElement = document.querySelector('article img');
+        const imageElement = document.getElementById('blog-post-image');
         if (!imageElement) return;
 
         if (post.featuredImage?.url) {
             imageElement.src = post.featuredImage.url;
             imageElement.alt = post.featuredImage.alt || post.title;
+            imageElement.classList.remove('hidden');
         }
     }
 
@@ -242,6 +267,61 @@ export class BlogPostLoader {
                 document.head.appendChild(metaTag);
             }
         });
+    }
+
+    /**
+     * Format Sanity portable text content
+     * @param {Array} blocks - Portable text blocks
+     * @returns {string} - HTML string
+     */
+    formatPortableText(blocks) {
+        if (!Array.isArray(blocks)) {
+            console.error('Invalid portable text blocks:', blocks);
+            return '';
+        }
+
+        return blocks.map(block => {
+            if (block._type !== 'block' || !block.children) {
+                return '';
+            }
+
+            const style = block.style || 'normal';
+
+            // Process the text content
+            const text = block.children.map(child => {
+                const marks = child.marks || [];
+                let content = child.text;
+
+                // Apply text decorations
+                if (marks.includes('strong')) {
+                    content = `<strong>${content}</strong>`;
+                }
+                if (marks.includes('em')) {
+                    content = `<em>${content}</em>`;
+                }
+                if (marks.includes('code')) {
+                    content = `<code>${content}</code>`;
+                }
+
+                return content;
+            }).join('');
+
+            // Apply block-level styling
+            switch (style) {
+                case 'h1':
+                    return `<h1 class="text-3xl font-bold mt-8 mb-4">${text}</h1>`;
+                case 'h2':
+                    return `<h2 class="text-2xl font-bold mt-6 mb-3">${text}</h2>`;
+                case 'h3':
+                    return `<h3 class="text-xl font-bold mt-4 mb-2">${text}</h3>`;
+                case 'blockquote':
+                    return `<blockquote class="pl-4 border-l-4 border-teal-500 italic my-4">${text}</blockquote>`;
+                case 'code':
+                    return `<pre class="bg-slate-100 p-4 rounded my-4"><code>${text}</code></pre>`;
+                default:
+                    return `<p class="mb-4">${text}</p>`;
+            }
+        }).join('\n');
     }
 
     /**

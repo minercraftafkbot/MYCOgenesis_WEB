@@ -248,34 +248,28 @@ section to keep visitors engaged. -->
     <main>
         <article class="py-20">
             <div class="container mx-auto px-6 max-w-3xl">
-                <header class="mb-12 text-center">
-                    <span class="text-sm font-semibold text-teal-600 uppercase">Tech Insights</span>
-                    <h1 class="text-4xl md:text-5xl font-bold mt-2 mb-4">The Brains Behind the Bloom: How IoT is Revolutionizing Our Mushroom Farm</h1>
-                    <p class="text-slate-500">By <span class="font-semibold text-slate-700">Jane Doe</span> • Published on August 15, 2025</p>
-                </header>
-                
-                <img src="https://images.unsplash.com/photo-1616597082843-a72175a3de38?q=80&w=1200&auto=format&fit=crop" alt="Mushroom farm with technology integration" class="w-full h-auto rounded-lg shadow-lg mb-12">
+                <!-- Loading spinner -->
+                <div id="loading-spinner" class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+                    <p class="mt-2 text-slate-600">Loading content...</p>
+                </div>
 
-                <div class="prose max-w-none text-slate-700">
-                    <p>Mushroom cultivation has traditionally been a delicate dance between art and science, heavily reliant on the grower's intuition. But what if we could replace intuition with precision? At MYCOgenesis, we're doing just that by integrating a sophisticated Internet of Things (IoT) ecosystem into the heart of our farm. This isn't just about modernization; it's about creating the absolute perfect environment for our fungi to flourish.</p>
+                <!-- Error message -->
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+
+                <!-- Blog post content -->
+                <div id="blog-post-content" class="hidden">
+                    <header class="mb-12 text-center">
+                        <span id="blog-post-category" class="text-sm font-semibold text-teal-600 uppercase"></span>
+                        <h1 id="blog-post-title" class="text-4xl md:text-5xl font-bold mt-2 mb-4"></h1>
+                        <p class="text-slate-500">By <span id="blog-post-author" class="font-semibold text-slate-700"></span> • Published on <span id="blog-post-date"></span></p>
+                    </header>
                     
-                    <h2>The Core: Our Sensor Network</h2>
-                    <p>The foundation of our smart farm is a network of high-precision sensors deployed throughout our growing rooms. These aren't just simple thermometers; they are a comprehensive suite of tools that act as our eyes and ears:</p>
-                    <ul>
-                        <li><strong>Temperature & Humidity Sensors:</strong> These maintain the precise moisture and warmth that mimic a mushroom's natural habitat.</li>
-                        <li><strong>CO₂ Sensors:</strong> Mushrooms "exhale" CO₂. High levels can stunt growth. Our sensors trigger ventilation systems to introduce fresh air exactly when needed.</li>
-                        <li><strong>Substrate Moisture Probes:</strong> We monitor moisture levels directly within the growing medium, ensuring the mycelium network has the hydration it needs for robust growth without the risk of waterlogging.</li>
-                        <li><strong>Light Sensors:</strong> While many mushrooms grow in the dark, specific light wavelengths and durations can trigger pinning (the start of a mushroom fruit body). Our system controls this with precision.</li>
-                    </ul>
+                    <img id="blog-post-image" src="" alt="" class="w-full h-auto rounded-lg shadow-lg mb-12 hidden">
 
-                    <h2>The Brain: Cloud Data and AI</h2>
-                    <p>All data from our ESP32 and ESP8266 microcontrollers is streamed in real-time to a Firebase cloud database. This is where the magic happens. Our AI and machine learning models analyze this continuous flow of information to:</p>
-                    <ul>
-                        <li><strong>Predict Growth Cycles:</strong> By learning from past data, our AI can predict optimal harvest times with remarkable accuracy.</li>
-                        <li><strong>Detect Anomalies:</strong> The system can identify subtle environmental shifts that could signal a problem—like potential contamination or equipment malfunction—long before a human could spot it.</li>
-                        <li><strong>Automate Actuators:</strong> The AI doesn't just monitor; it acts. It automatically controls fans, misters, heaters, and LED lights to maintain the set-point parameters for each specific mushroom variety, 24/7.</li>
-                    </ul>
-                    <p>By blending nature's blueprint with cutting-edge technology, we ensure every single mushroom we produce is of consistent, premium quality. It's a system that reduces waste, maximizes yield, and allows us to cultivate tomorrow's flavors, today.</p>
+                    <div id="blog-post-body" class="prose max-w-none text-slate-700">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
                 </div>
             </div>
         </article>
