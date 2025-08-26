@@ -3,28 +3,97 @@
  * Dynamically loads and displays blog content from Sanity CMS
  */
 
-import { sanityService } from '../services/sanity-service.js';
+import { getBlogPosts, sanityService } from '../services/sanity-service.js';
 
-export class BlogLoader {
-    constructor() {
-        this.currentPage = 1;
-        this.postsPerPage = 6;
-        this.isLoading = false;
-        this.hasMorePosts = true;
-        this.currentCategory = '';
-        this.currentSort = 'latest';
-        this.searchTerm = '';
-        
-        // DOM Elements
-        this.blogPostsGrid = null;
-        this.loadingSpinner = null;
-        this.errorMessage = null;
-        this.filters = {
-            categoryFilter: null,
-            sortFilter: null,
-            searchFilter: null
-        };
-    }
+const blogLoader = {
+    blogPostsGrid: null,
+    loadingSpinner: null,
+    errorMessage: null,
+    filters: {
+        categoryFilter: null,
+        sortFilter: null,
+        searchFilter: null
+    },
+    currentPage: 1,
+    postsPerPage: 6,
+    isLoading: false,
+    hasMorePosts: true,
+    currentCategory: '',
+    currentSort: 'latest',
+    searchTerm: '',
+    htmlEscapes: {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    },
+
+    async init() {
+        await this.initialize();
+    },
+
+    async initialize() {
+        try {
+            console.log('🔄 Initializing blog loader components...');
+            
+            // Get required DOM elements
+            this.blogPostsGrid = document.getElementById('blog-posts-grid');
+            this.loadingSpinner = document.getElementById('loading-spinner');
+            this.errorMessage = document.getElementById('error-message');
+            
+            // Get filter elements
+            this.filters.categoryFilter = document.getElementById('category-filter');
+            this.filters.sortFilter = document.getElementById('sort-filter');
+            this.filters.searchFilter = document.getElementById('search-filter');
+
+            // Load initial content
+            await this.loadFeaturedPost();
+            await this.loadLatestPosts();
+            
+            // Initialize filters and event listeners
+            await this.initializeFilters();
+            this.setupEventListeners();
+            
+            console.log('✅ Blog loader fully initialized');
+        } catch (error) {
+            console.error('Error initializing blog loader:', error);
+            this.showErrorMessage('Failed to load blog content');
+        }
+    },
+
+    async initializeFilters() {
+        try {
+            console.log('🔄 Initializing blog filters...');
+            
+            // Only proceed if we have the category filter
+            if (!this.filters.categoryFilter) {
+                console.log('⚠️ Category filter element not found, skipping filter initialization');
+                return;
+            }
+
+            // Load categories from Sanity
+            const categories = await sanityService.getCategories();
+            
+            // Clear existing options except "All Categories"
+            while (this.filters.categoryFilter.children.length > 1) {
+                this.filters.categoryFilter.removeChild(this.filters.categoryFilter.lastChild);
+            }
+
+            // Add categories
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.slug?.current || '';
+                option.textContent = category.name;
+                this.filters.categoryFilter.appendChild(option);
+            });
+
+            console.log(`✅ Initialized filters with ${categories.length} categories`);
+        } catch (error) {
+            console.error('Error initializing filters:', error);
+            // Don't throw error, just log it - the blog should still work without filters
+        }
+    },
 
     /**
      * Initialize blog loader
@@ -57,7 +126,7 @@ export class BlogLoader {
             console.error('Error initializing blog loader:', error);
             this.showErrorMessage('Failed to load blog content');
         }
-    }
+    },
 
     /**
      * Initialize filters with data from Sanity
@@ -134,7 +203,7 @@ export class BlogLoader {
                 }, 500);
             });
         }
-    }
+    },
 
     /**
      * Reset page and reload posts
@@ -146,7 +215,7 @@ export class BlogLoader {
             this.blogPostsGrid.innerHTML = '';
         }
         await this.loadLatestPosts();
-    }
+    },
 
     /**
      * Load and display featured blog post
@@ -165,7 +234,7 @@ export class BlogLoader {
         } catch (error) {
             console.error('Error loading featured post:', error);
         }
-    }
+    },
 
     /**
      * Load and display latest blog posts
@@ -178,7 +247,7 @@ export class BlogLoader {
         this.showLoadingState();
 
         try {
-            const posts = await sanityService.getBlogPosts({
+            const posts = await getBlogPosts({
                 category: this.currentCategory,
                 search: this.searchTerm,
                 sort: this.currentSort,
@@ -186,21 +255,64 @@ export class BlogLoader {
                 limit: this.postsPerPage
             });
 
+            console.log('📦 Fetched posts:', posts);
+            
             if (posts.length < this.postsPerPage) {
                 this.hasMorePosts = false;
+                console.log('🏁 No more posts available');
             }
 
             this.renderPosts(posts);
             this.currentPage++;
+            
+            this.hideLoadingState();
+            console.log(`✅ Successfully rendered ${posts.length} posts`);
 
         } catch (error) {
-            console.error('Error loading latest posts:', error);
-            this.showErrorMessage('Failed to load blog posts');
+            console.error('❌ Error loading latest posts:', error);
+            this.showErrorMessage('Failed to load blog posts. Please try refreshing the page.');
         } finally {
             this.isLoading = false;
-            this.hideLoadingState();
         }
-    }
+    },
+
+    /**
+     * Escape HTML special characters
+     * @param {string} str - String to escape
+     * @returns {string} - Escaped string
+     */
+    escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>"']/g, char => this.htmlEscapes[char] || char);
+    },
+
+    /**
+     * Show empty state when no posts are found
+     */
+    showEmptyState() {
+        if (!this.blogPostsGrid) return;
+        
+        this.blogPostsGrid.innerHTML = `
+            <div class="col-span-full text-center py-10">
+                <svg class="mx-auto h-12 w-12 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                <h3 class="mt-4 text-lg font-semibold text-slate-900">Blog Coming Soon!</h3>
+                <p class="mt-2 text-base text-slate-600 max-w-md mx-auto">
+                    We're working on exciting content about mushroom cultivation, sustainable farming, and culinary insights. 
+                    Check back soon for our latest articles!
+                </p>
+                <div class="mt-6">
+                    <a href="../index.html#contact" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                        Get Notified When We Launch
+                    </a>
+                </div>
+            </div>
+        `;
+        this.hideLoadingState();
+    },
 
     /**
      * Load more posts for infinite scroll
@@ -209,7 +321,7 @@ export class BlogLoader {
         if (!this.isLoading && this.hasMorePosts) {
             await this.loadLatestPosts();
         }
-    }
+    },
 
     /**
      * Render featured blog post
@@ -237,7 +349,7 @@ export class BlogLoader {
                     </div>
                 </a>
             </div>`;
-    }
+    },
 
     /**
      * Render blog posts
@@ -276,7 +388,7 @@ export class BlogLoader {
         } else {
             this.blogPostsGrid.insertAdjacentHTML('beforeend', postsHTML);
         }
-    }
+    },
 
     /**
      * Show loading state
@@ -284,8 +396,13 @@ export class BlogLoader {
     showLoadingState() {
         if (this.loadingSpinner) {
             this.loadingSpinner.classList.remove('hidden');
+            
+            // Dim existing content while loading
+            if (this.blogPostsGrid) {
+                this.blogPostsGrid.style.opacity = '0.5';
+            }
         }
-    }
+    },
 
     /**
      * Hide loading state
@@ -293,8 +410,13 @@ export class BlogLoader {
     hideLoadingState() {
         if (this.loadingSpinner) {
             this.loadingSpinner.classList.add('hidden');
+            
+            // Restore content visibility
+            if (this.blogPostsGrid) {
+                this.blogPostsGrid.style.opacity = '1';
+            }
         }
-    }
+    },
 
     /**
      * Show error message
@@ -302,8 +424,18 @@ export class BlogLoader {
      */
     showErrorMessage(message) {
         if (this.errorMessage) {
-            this.errorMessage.textContent = message;
+            this.errorMessage.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="h-5 w-5 text-red-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>${this.escapeHtml(message)}</span>
+                </div>
+            `;
             this.errorMessage.classList.remove('hidden');
         }
     }
-}
+};
+
+export { blogLoader };

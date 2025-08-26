@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/praveensaummya/MYCOgenesis_WEB#readme",
   "devDependencies": {
+    "@sanity/client": "^7.9.0",
+    "dotenv": "^17.2.1",
     "tailwindcss": "^4.1.12"
   }
 }
