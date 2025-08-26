@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MYCOgenesis - Cultivating Tomorrow's Flavors, Today</title>
+    <title>MYCOgenesis - Premium Mushroom Cultivation | Sustainable Smart Farming</title>
+    <meta name="description" content="Experience the future of mushroom farming with MYCOgenesis. Premium quality mushrooms grown using cutting-edge IoT technology and sustainable practices.">
     <link rel="stylesheet" href="css/tailwind.css">
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
@@ -94,6 +95,63 @@
       /* Message notification styles */
       .message-notification {
         backdrop-filter: blur(8px);
+      }
+
+      /* Enhanced animations */
+      .fade-in-up {
+        animation: fadeInUp 0.8s ease-out forwards;
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stagger-1 { animation-delay: 0.1s; }
+      .stagger-2 { animation-delay: 0.2s; }
+      .stagger-3 { animation-delay: 0.3s; }
+
+      /* Gradient text */
+      .gradient-text {
+        background: linear-gradient(135deg, #0d9488, #14b8a6, #2dd4bf);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* Enhanced cards */
+      .enhanced-card {
+        background: linear-gradient(145deg, #ffffff, #f8fafc);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .enhanced-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      /* Floating elements */
+      .floating {
+        animation: float 6s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+
+      /* Parallax effect */
+      .parallax-bg {
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
       }
     </style>
   </head>
@@ -449,7 +507,14 @@
 
     <main>
       <!-- Hero Section -->
-      <section id="home" class="hero-bg text-white">
+      <section id="home" class="hero-bg text-white relative overflow-hidden">
+        <!-- Animated background elements -->
+        <div class="absolute inset-0 opacity-20">
+          <div class="floating absolute top-20 left-10 w-4 h-4 bg-teal-400 rounded-full"></div>
+          <div class="floating absolute top-40 right-20 w-6 h-6 bg-emerald-400 rounded-full" style="animation-delay: 2s;"></div>
+          <div class="floating absolute bottom-32 left-1/4 w-3 h-3 bg-cyan-400 rounded-full" style="animation-delay: 4s;"></div>
+        </div>
+        
         <div
           class="hero-bg-image"
           style="
@@ -469,32 +534,37 @@
           "
         ></div>
         <div
-          class="bg-black/60 min-h-[60vh] md:min-h-[70vh] flex items-center relative z-10"
+          class="bg-gradient-to-br from-black/70 via-black/60 to-black/50 min-h-[80vh] md:min-h-[85vh] flex items-center relative z-10"
         >
           <div class="container mx-auto px-4 md:px-6 py-8 md:py-12 text-center">
             <h1
-              class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight hero-title"
+              class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight hero-title fade-in-up"
             >
-              Cultivating Tomorrow's Flavors, Today
+              Cultivating Tomorrow's 
+              <span class="gradient-text">Flavors</span>, Today
             </h1>
             <p
-              class="text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-3xl mx-auto hero-description"
+              class="text-lg sm:text-xl md:text-2xl mb-8 md:mb-10 max-w-4xl mx-auto hero-description fade-in-up stagger-1 leading-relaxed"
             >
-              Harnessing nature's intelligence and modern technology for
+              Harnessing <strong class="text-teal-300">nature's intelligence</strong> and 
+              <strong class="text-emerald-300">cutting-edge technology</strong> for
               superior quality, sustainable, and diverse mushroom varieties.
             </p>
+            <p class="text-base sm:text-lg text-gray-300 mb-8 max-w-2xl mx-auto fade-in-up stagger-2">
+              🌱 IoT-Powered Growing • 🍄 Premium Quality • 🌍 Sustainable Practices
+            </p>
             <div
-              class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6"
+              class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 fade-in-up stagger-3"
             >
               <a
                 href="#mushrooms"
-                class="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-center"
-                >Explore Our Mushrooms</a
+                class="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 text-center"
+                >🍄 Explore Our Mushrooms</a
               >
               <a
                 href="#smart-farm"
-                class="w-full sm:w-auto bg-stone-200 hover:bg-stone-300 text-slate-800 font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg text-center"
-                >Our Technology</a
+                class="w-full sm:w-auto bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 text-center border border-white/20"
+                >🚀 Our Technology</a
               >
             </div>
           </div>
@@ -502,12 +572,21 @@
       </section>
 
       <!-- Value Proposition -->
-      <section class="py-20 bg-white">
+      <section class="py-24 bg-gradient-to-br from-white via-gray-50 to-teal-50">
         <div class="container mx-auto px-6">
+          <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              Why Choose <span class="gradient-text">MYCOgenesis</span>?
+            </h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Experience the perfect fusion of traditional cultivation wisdom and modern innovation
+            </p>
+          </div>
           <div class="grid md:grid-cols-3 gap-10 text-center">
-            <div class="p-6">
-              <svg
-                class="w-12 h-12 mx-auto mb-4 text-teal-600"
+            <div class="enhanced-card p-8 rounded-2xl fade-in-up stagger-1">
+              <div class="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl flex items-center justify-center">
+                <svg
+                class="w-8 h-8 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -520,15 +599,17 @@
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <h3 class="font-bold text-xl mb-2">Precision Climate Control</h3>
-              <p class="text-slate-600">
+              </div>
+              <h3 class="font-bold text-xl mb-4 text-slate-800">Precision Climate Control</h3>
+              <p class="text-slate-600 leading-relaxed">
                 IoT and AI-driven systems ensure optimal growing conditions
-                24/7, mimicking nature perfectly.
+                24/7, mimicking nature's perfect balance.
               </p>
             </div>
-            <div class="p-6">
-              <svg
-                class="w-12 h-12 mx-auto mb-4 text-teal-600"
+            <div class="enhanced-card p-8 rounded-2xl fade-in-up stagger-2">
+              <div class="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                <svg
+                class="w-8 h-8 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -541,15 +622,17 @@
                   d="M5 13l4 4L19 7"
                 ></path>
               </svg>
-              <h3 class="font-bold text-xl mb-2">Unmatched Quality</h3>
-              <p class="text-slate-600">
+              </div>
+              <h3 class="font-bold text-xl mb-4 text-slate-800">Unmatched Quality</h3>
+              <p class="text-slate-600 leading-relaxed">
                 Consistently perfect mushrooms, harvested at their peak, from
                 our living farm to your table.
               </p>
             </div>
-            <div class="p-6">
-              <svg
-                class="w-12 h-12 mx-auto mb-4 text-teal-600"
+            <div class="enhanced-card p-8 rounded-2xl fade-in-up stagger-3">
+              <div class="w-16 h-16 mx-auto mb-6 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center">
+                <svg
+                class="w-8 h-8 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -562,8 +645,9 @@
                   d="M13 10V3L4 14h7v7l9-11h-7z"
                 ></path>
               </svg>
-              <h3 class="font-bold text-xl mb-2">Sustainable Practices</h3>
-              <p class="text-slate-600">
+              </div>
+              <h3 class="font-bold text-xl mb-4 text-slate-800">Sustainable Practices</h3>
+              <p class="text-slate-600 leading-relaxed">
                 Minimizing our footprint with resource-efficient, circular
                 economy methods that honor the earth.
               </p>
@@ -573,10 +657,19 @@
       </section>
 
       <!-- Featured Products -->
-      <section id="featured-products" class="py-20">
+      <section id="featured-products" class="py-24 bg-white relative">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500"></div>
+        
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-12">
-            Our Featured Varieties
+          <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              Our <span class="gradient-text">Featured</span> Varieties
+            </h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Discover our premium selection of sustainably grown mushrooms, each variety carefully cultivated for exceptional flavor and nutrition
+            </p>
+          </div>
           </h2>
           
           <!-- Loading spinner -->
@@ -596,33 +689,52 @@
       </section>
 
       <!-- About Us Section -->
-      <section id="about" class="py-20 bg-white">
+      <section id="about" class="py-24 bg-gradient-to-br from-slate-50 via-white to-teal-50 relative">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+          <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, #0d9488 2px, transparent 2px), radial-gradient(circle at 75% 75%, #14b8a6 2px, transparent 2px); background-size: 50px 50px;"></div>
+        </div>
+        
         <div class="container mx-auto px-6">
           <div class="grid md:grid-cols-2 gap-16 items-center">
-            <div>
+            <div class="fade-in-up">
               <h2 class="text-3xl font-bold mb-4">
-                The Art and Science of Fungi
+                The Art and <span class="gradient-text">Science</span> of Fungi
               </h2>
-              <p class="text-slate-600 mb-4 text-lg">
+              <p class="text-slate-600 mb-6 text-lg leading-relaxed">
                 MYCOgenesis was born from a passion for sustainable agriculture
                 and a fascination with the untapped potential of fungi. Our
                 mission is to blend age-old cultivation wisdom with cutting-edge
                 technology to produce mushrooms of unparalleled quality and
                 consistency.
               </p>
-              <p class="text-slate-600">
+              <p class="text-slate-600 leading-relaxed">
                 We believe in a future where food production is both smart and
                 sustainable. By creating the perfect, climate-controlled
                 environment, we not only grow exceptional mushrooms but also
                 contribute to a circular economy, turning agricultural waste
                 into a source of wealth and nutrition.
               </p>
+              <div class="mt-8 flex items-center space-x-6">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-teal-600">100%</div>
+                  <div class="text-sm text-slate-500">Sustainable</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-teal-600">24/7</div>
+                  <div class="text-sm text-slate-500">Monitoring</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-teal-600">15+</div>
+                  <div class="text-sm text-slate-500">Varieties</div>
+                </div>
+              </div>
             </div>
-            <div>
+            <div class="fade-in-up stagger-1">
               <img
                 src="/images/home_page/oyster_hand_holding_substrate.png"
                 alt="Hands holding mushroom substrate"
-                class="rounded-lg shadow-xl"
+                class="rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
               />
             </div>
           </div>
@@ -630,121 +742,195 @@
       </section>
 
       <!-- Our Mushrooms Section -->
-      <section id="mushrooms" class="py-20">
+      <section id="mushrooms" class="py-24 bg-white">
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-16">
-            Explore Our Varieties
+          <div class="text-center mb-20 fade-in-up">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              Explore Our <span class="gradient-text">Premium</span> Varieties
+            </h2>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+              Each variety is meticulously cultivated using our advanced IoT systems, ensuring optimal nutrition, flavor, and sustainability
+            </p>
+          </div>
           </h2>
           <div class="space-y-20">
             <!-- Mushroom Variety -->
-            <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="grid md:grid-cols-2 gap-16 items-center fade-in-up">
               <img
                 src="images/home_page/portabelo_on_cuttingtale.png"
                 alt="Portobello Mushrooms"
-                class="rounded-lg shadow-lg w-full"
+                class="rounded-2xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500"
               />
-              <div>
-                <h3 class="text-2xl font-bold mb-3">
+              <div class="space-y-4">
+                <div class="inline-block px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
+                  🍄 Classic Variety
+                </div>
+                <h3 class="text-2xl md:text-3xl font-bold mb-4 text-slate-800">
                   Button, Cremini & Portobello
                 </h3>
-                <p class="text-slate-600 mb-4">
+                <p class="text-slate-600 mb-6 text-lg leading-relaxed">
                   These are all the same mushroom (Agaricus bisporus) at
                   different stages of maturity. From the mild, familiar white
                   button to the slightly richer cremini and the large, meaty
                   portobello, they are the versatile workhorses of the culinary
                   world.
                 </p>
+                <div class="flex flex-wrap gap-2">
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Versatile</span>
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Mild Flavor</span>
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Year-Round</span>
+                </div>
               </div>
             </div>
             <!-- Mushroom Variety -->
-            <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div class="grid md:grid-cols-2 gap-16 items-center fade-in-up">
               <div class="md:order-2">
                 <img
                   src="images/home_page/oyster_on_the table.png"
                   alt="Oyster Mushrooms"
-                  class="rounded-lg shadow-lg w-full"
+                  class="rounded-2xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <div class="md:order-1">
-                <h3 class="text-2xl font-bold mb-3">Oyster Mushrooms</h3>
-                <p class="text-slate-600 mb-4">
+              <div class="md:order-1 space-y-4">
+                <div class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+                  🌈 Colorful Collection
+                </div>
+                <h3 class="text-2xl md:text-3xl font-bold mb-4 text-slate-800">Oyster Mushrooms</h3>
+                <p class="text-slate-600 mb-6 text-lg leading-relaxed">
                   Named for their fan-like shape, Oyster mushrooms (Pleurotus
                   ostreatus) come in a stunning array of colors like blue, gold,
                   and pink. They are easy to cultivate and have a delicate, mild
                   flavor perfect for a variety of dishes.
                 </p>
+                <div class="flex flex-wrap gap-2">
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Delicate Flavor</span>
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Multiple Colors</span>
+                  <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm">Fast Growing</span>
+                </div>
               </div>
             </div>
             <!-- Other varieties follow the same alternating pattern -->
           </div>
           <div
-            class="mt-20 p-6 bg-amber-100/50 border-l-4 border-amber-500 text-amber-800 rounded-md"
+            class="mt-24 p-8 bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-500 text-amber-800 rounded-xl shadow-lg fade-in-up"
           >
-            <p class="font-bold">Important Disclaimer:</p>
-            <p>
+            <div class="flex items-start space-x-4">
+              <div class="text-2xl">⚠️</div>
+              <div>
+                <p class="font-bold text-lg mb-2">Important Disclaimer:</p>
+                <p class="leading-relaxed">
               MYCOgenesis is dedicated to cultivating culinary and medicinal
               mushroom varieties. We do not cultivate, sell, or distribute
               psilocybin-containing mushrooms, which are classified as a
               Schedule 1 drug and are subject to legal restrictions.
-            </p>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <!-- Our Smart Farm Section -->
-      <section id="smart-farm" class="py-20 bg-white">
+      <section id="smart-farm" class="py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-white relative overflow-hidden">
+        <!-- Animated background -->
+        <div class="absolute inset-0 opacity-10">
+          <div class="absolute top-20 left-20 w-2 h-2 bg-teal-400 rounded-full animate-pulse"></div>
+          <div class="absolute top-40 right-32 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" style="animation-delay: 1s;"></div>
+          <div class="absolute bottom-32 left-1/3 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay: 2s;"></div>
+        </div>
+        
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-16">
-            Technology Inspired by Nature
+          <div class="text-center mb-20 fade-in-up">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+              Technology <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">Inspired by Nature</span>
+            </h2>
+            <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+              Our revolutionary IoT ecosystem creates the perfect growing environment, combining ancient wisdom with modern innovation
+            </p>
+          </div>
           </h2>
           <div class="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h3 class="text-2xl font-bold mb-4">The IoT Solution</h3>
-              <p class="text-slate-600 mb-4">
+            <div class="fade-in-up">
+              <div class="inline-block px-4 py-2 bg-teal-500/20 text-teal-300 rounded-full text-sm font-medium mb-4">
+                🚀 Innovation Hub
+              </div>
+              <h3 class="text-2xl md:text-3xl font-bold mb-6">The IoT Solution</h3>
+              <p class="text-gray-300 mb-6 text-lg leading-relaxed">
                 We've moved beyond the inconsistencies of traditional farming.
                 Our farm is powered by an Internet of Things (IoT) ecosystem
                 that provides real-time monitoring and automated control over
                 every aspect of the cultivation environment.
               </p>
-              <ul class="list-disc list-inside text-slate-600 space-y-2">
+              <ul class="space-y-4 text-gray-300">
                 <li>
-                  <strong>Sensors:</strong> High-precision sensors continuously
+                  <div class="flex items-start space-x-3">
+                    <div class="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center mt-0.5">
+                      <div class="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <div>
+                      <strong class="text-white">Sensors:</strong> High-precision sensors continuously
                   track temperature, humidity, CO₂, and light.
+                    </div>
+                  </div>
                 </li>
                 <li>
-                  <strong>Actuators:</strong> The system automatically adjusts
+                  <div class="flex items-start space-x-3">
+                    <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center mt-0.5">
+                      <div class="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <div>
+                      <strong class="text-white">Actuators:</strong> The system automatically adjusts
                   conditions using fans, misters, and heaters.
+                    </div>
+                  </div>
                 </li>
                 <li>
-                  <strong>Remote Monitoring:</strong> All data is streamed to a
+                  <div class="flex items-start space-x-3">
+                    <div class="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center mt-0.5">
+                      <div class="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <div>
+                      <strong class="text-white">Remote Monitoring:</strong> All data is streamed to a
                   cloud dashboard, for management from anywhere, anytime.
+                    </div>
+                  </div>
                 </li>
               </ul>
             </div>
-            <div>
+            <div class="fade-in-up stagger-1">
               <img
                 src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop"
                 alt="Scientist with tablet in a modern farm"
-                class="rounded-lg shadow-xl"
+                class="rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500"
               />
             </div>
           </div>
-          <div class="mt-16">
-            <h3 class="text-2xl font-bold mb-8 text-center">
+          <div class="mt-20 fade-in-up">
+            <h3 class="text-2xl md:text-3xl font-bold mb-12 text-center">
               AI Integration & Sustainability
             </h3>
-            <div class="grid md:grid-cols-2 gap-8">
-              <div class="bg-stone-100 p-8 rounded-lg">
-                <h4 class="font-bold text-lg mb-2">Predictive Analytics</h4>
-                <p class="text-slate-600">
+            <div class="grid md:grid-cols-2 gap-10">
+              <div class="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+                <div class="w-12 h-12 bg-gradient-to-br from-teal-400 to-emerald-400 rounded-xl flex items-center justify-center mb-4">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <h4 class="font-bold text-xl mb-3 text-white">Predictive Analytics</h4>
+                <p class="text-gray-300 leading-relaxed">
                   Our AI models analyze data to predict optimal harvest times
                   and proactively adjust environmental controls, ensuring peak
                   quality and yield.
                 </p>
               </div>
-              <div class="bg-stone-100 p-8 rounded-lg">
-                <h4 class="font-bold text-lg mb-2">Circular Economy</h4>
-                <p class="text-slate-600">
+              <div class="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300">
+                <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-xl flex items-center justify-center mb-4">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                </div>
+                <h4 class="font-bold text-xl mb-3 text-white">Circular Economy</h4>
+                <p class="text-gray-300 leading-relaxed">
                   We utilize agricultural waste like sawdust and rice bran as
                   our growing substrate, reducing our carbon footprint and
                   turning waste into wealth.
@@ -756,9 +942,16 @@
       </section>
 
       <!-- Shop Section -->
-      <section id="shop" class="py-20">
+      <section id="shop" class="py-24 bg-gradient-to-br from-teal-50 via-white to-emerald-50">
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-12">Shop Our Products</h2>
+          <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              Shop Our <span class="gradient-text">Premium</span> Products
+            </h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Fresh, sustainably grown mushrooms delivered directly from our smart farm to your kitchen
+            </p>
+          </div>
           
           <!-- Loading spinner -->
           <div id="shop-loading-spinner" class="hidden text-center py-8">
@@ -778,99 +971,194 @@
           <div class="text-center mt-12">
             <a
               href="pages/business.html"
-              class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg"
-              >View All Products</a
+              class="inline-flex items-center bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+              >
+              View All Products
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+              </a
             >
           </div>
         </div>
       </section>
 
       <!-- Blog Section -->
-      <section id="blog" class="py-20 bg-white">
+      <section id="blog" class="py-24 bg-white relative">
+        <!-- Decorative gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-transparent via-teal-50/30 to-transparent"></div>
+        
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-12">From the Blog</h2>
+          <div class="text-center mb-16 fade-in-up relative z-10">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              From the <span class="gradient-text">Blog</span>
+            </h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Insights, tips, and stories from the world of sustainable mushroom cultivation and mycology research
+            </p>
+          </div>
           <!-- Blog grid - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop -->
-          <div class="flex flex-wrap justify-center gap-6 lg:gap-8">
+          <div class="flex flex-wrap justify-center gap-6 lg:gap-8 relative z-10">
             <!-- Dynamic blog posts will be loaded here -->
           </div>
-          <div class="text-center">
+          <div class="text-center relative z-10">
             <a
               href="blog/blog.html"
-              class="mt-12 inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg"
-              >View All Articles</a
+              class="mt-12 inline-flex items-center bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+              >
+              📚 View All Articles
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+              </a
             >
           </div>
         </div>
       </section>
 
       <!-- Contact Section -->
-      <section id="contact" class="py-20 bg-stone-100">
+      <section id="contact" class="py-24 bg-gradient-to-br from-slate-100 via-stone-100 to-teal-100 relative">
+        <!-- Background pattern -->
+        <div class="absolute inset-0 opacity-5">
+          <div class="absolute inset-0" style="background-image: radial-gradient(circle at 20% 80%, #0d9488 1px, transparent 1px), radial-gradient(circle at 80% 20%, #14b8a6 1px, transparent 1px); background-size: 40px 40px;"></div>
+        </div>
+        
         <div class="container mx-auto px-6">
-          <h2 class="text-3xl font-bold text-center mb-12">Get In Touch</h2>
-          <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-xl">
-            <form>
+          <div class="text-center mb-16 fade-in-up relative z-10">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">
+              Get In <span class="gradient-text">Touch</span>
+            </h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+              Ready to start your mushroom journey? Have questions about our technology? We'd love to hear from you.
+            </p>
+          </div>
+          
+          <div class="max-w-2xl mx-auto">
+            <div class="bg-white/80 backdrop-blur-sm p-10 rounded-2xl shadow-2xl border border-white/20 fade-in-up stagger-1 relative z-10">
+              <form class="space-y-6">
               <div class="mb-4">
-                <label for="name" class="block text-slate-700 font-bold mb-2"
+                <label for="name" class="block text-slate-700 font-semibold mb-3 text-lg"
                   >Name</label
                 >
                 <input
                   type="text"
                   id="name"
-                  class="shadow-sm appearance-none border rounded w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  class="w-full py-4 px-6 text-slate-700 bg-white border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder="Your Name"
                 />
               </div>
               <div class="mb-4">
-                <label for="email" class="block text-slate-700 font-bold mb-2"
+                <label for="email" class="block text-slate-700 font-semibold mb-3 text-lg"
                   >Email</label
                 >
                 <input
                   type="email"
                   id="email"
-                  class="shadow-sm appearance-none border rounded w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  class="w-full py-4 px-6 text-slate-700 bg-white border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
                   placeholder="your.email@example.com"
                 />
               </div>
               <div class="mb-6">
-                <label for="message" class="block text-slate-700 font-bold mb-2"
+                <label for="message" class="block text-slate-700 font-semibold mb-3 text-lg"
                   >Message</label
                 >
                 <textarea
                   id="message"
-                  rows="5"
-                  class="shadow-sm appearance-none border rounded w-full py-3 px-4 text-slate-700 leading-tight focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  rows="6"
+                  class="w-full py-4 px-6 text-slate-700 bg-white border-2 border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md resize-none"
                   placeholder="Your message..."
                 ></textarea>
               </div>
               <div class="text-center">
                 <button
                   type="submit"
-                  class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg"
+                  class="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
                 >
-                  Send Message
+                  📧 Send Message
                 </button>
               </div>
             </form>
+            
+            <!-- Contact info -->
+            <div class="mt-10 pt-8 border-t border-slate-200">
+              <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="flex flex-col items-center">
+                  <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="text-sm text-slate-600">Email</div>
+                  <div class="font-medium text-slate-800">info@mycogenesis.com</div>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="text-sm text-slate-600">Location</div>
+                  <div class="font-medium text-slate-800">Smart Farm Facility</div>
+                </div>
+                <div class="flex flex-col items-center">
+                  <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div class="text-sm text-slate-600">Response Time</div>
+                  <div class="font-medium text-slate-800">Within 24 hours</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-800 text-stone-300 py-8">
+    <footer class="bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 text-stone-300 py-12 relative overflow-hidden">
+      <!-- Background pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 25% 25%, #0d9488 1px, transparent 1px); background-size: 30px 30px;"></div>
+      </div>
+      
       <div class="container mx-auto px-6 text-center">
-        <p>&copy; 2025 MYCOgenesis. All Rights Reserved.</p>
-        <div class="flex justify-center space-x-6 mt-4">
-          <a href="#" class="hover:text-teal-400">Facebook</a>
-          <a href="#" class="hover:text-teal-400">Instagram</a>
-          <a href="#" class="hover:text-teal-400">Twitter</a>
+        <div class="mb-8">
+          <div class="flex items-center justify-center mb-4">
+            <img src="images/logo/MYCOgenesis.svg" alt="MYCOgenesis Logo" class="h-12 w-12 mr-3">
+            <span class="text-2xl font-bold text-white">MYCOgenesis</span>
+          </div>
+          <p class="text-gray-400 max-w-md mx-auto">
+            Cultivating tomorrow's flavors with sustainable technology and passionate expertise.
+          </p>
+        </div>
+        
+        <div class="border-t border-slate-700 pt-8">
+          <p class="text-gray-400 mb-4">&copy; 2025 MYCOgenesis. All Rights Reserved.</p>
+          <div class="flex justify-center space-x-8 mb-4">
+            <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+              <span>Twitter</span>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/></svg>
+              <span>Facebook</span>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.219-5.175 1.219-5.175s-.311-.623-.311-1.544c0-1.445.839-2.524 1.883-2.524.888 0 1.317.666 1.317 1.466 0 .893-.568 2.228-.861 3.467-.245 1.038.52 1.884 1.545 1.884 1.854 0 3.279-1.954 3.279-4.776 0-2.499-1.798-4.248-4.364-4.248-2.973 0-4.717 2.23-4.717 4.535 0 .898.346 1.861.778 2.384.085.104.097.195.072.301-.079.329-.255 1.018-.289 1.161-.045.189-.147.229-.339.138-1.273-.593-2.068-2.456-2.068-3.955 0-3.207 2.329-6.15 6.72-6.15 3.528 0 6.273 2.513 6.273 5.871 0 3.502-2.211 6.321-5.273 6.321-1.030 0-1.999-.537-2.330-1.177 0 0-.511 1.946-.635 2.424-.23.883-.854 1.988-1.271 2.661C9.596 23.522 10.75 24.001 12.017 24.001c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/></svg>
+              <span>Instagram</span>
+            </a>
+          </div>
           <span class="text-slate-500">|</span>
           <a
             href="#"
             onclick="openCMS()"
-            class="text-slate-400 hover:text-slate-200 transition-colors text-sm cursor-pointer"
+            class="text-slate-400 hover:text-teal-400 transition-colors text-sm cursor-pointer font-medium"
             title="Content Management System"
-            >CMS Studio</a>
+            >🎨 CMS Studio</a>
+        </div>
         </div>
       </div>
     </footer>
@@ -979,6 +1267,26 @@
 
       // Start the background rotation
       setInterval(rotateHeroBackground, 5000); // Change background every 5 seconds
+
+      // Intersection Observer for animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in-up');
+          }
+        });
+      }, observerOptions);
+
+      // Observe elements for animation
+      document.addEventListener('DOMContentLoaded', () => {
+        const animatedElements = document.querySelectorAll('.fade-in-up');
+        animatedElements.forEach(el => observer.observe(el));
+      });
 
       // CMS Studio Access Function
       async function openCMS() {

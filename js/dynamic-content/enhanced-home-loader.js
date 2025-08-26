@@ -247,35 +247,40 @@ export class EnhancedHomeLoader {
     const productUrl = this.getProductUrl(product);
 
     return `
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group w-full max-w-sm">
+      <div class="enhanced-card rounded-2xl overflow-hidden group w-full max-w-sm fade-in-up">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 
             alt="${imageAlt}" 
-            class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
+            class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
           >
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+          <div class="absolute top-4 left-4">
+            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-teal-700 rounded-full text-xs font-medium">
+              🌱 Fresh
+            </span>
+          </div>
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-xl mb-2 group-hover:text-teal-600 transition-colors duration-200">
+        <div class="p-8">
+          <h3 class="font-bold text-xl mb-3 group-hover:text-teal-600 transition-colors duration-200">
             ${product.name}
           </h3>
-          <p class="text-slate-600 mb-4 line-clamp-2">${description}</p>
+          <p class="text-slate-600 mb-6 line-clamp-2 leading-relaxed">${description}</p>
           <div class="flex justify-between items-center">
             <a 
               href="${productUrl}" 
-              class="text-teal-600 hover:text-teal-800 font-semibold transition-colors duration-200 flex items-center group"
+              class="inline-flex items-center text-teal-600 hover:text-teal-800 font-semibold transition-all duration-200 group-hover:translate-x-1"
               data-product-id="${product._id || product.id}"
             >
               Learn More 
-              <svg class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </a>
             ${this.renderAvailabilityBadge(product.availability)}
           </div>
-          ${product.price ? `<div class="mt-3 text-lg font-bold text-teal-600">$${product.price}</div>` : ''}
+          ${product.price ? `<div class="mt-4 text-xl font-bold text-teal-600">$${product.price}</div>` : ''}
         </div>
       </div>
     `;
@@ -372,21 +377,23 @@ export class EnhancedHomeLoader {
 
     if (!products || products.length === 0) {
       container.innerHTML = `
-        <div class="col-span-full text-center py-12">
-          <div class="text-6xl mb-4">🛒</div>
-          <h3 class="text-xl font-semibold text-slate-800 mb-2">Online Store Coming Soon</h3>
-          <p class="text-slate-600 mb-6">Get ready to order fresh, sustainably grown mushrooms delivered straight from our farm to your door.</p>
-          <div class="flex flex-wrap gap-2 justify-center mb-6">
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Fresh Delivery</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Farm Direct</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Sustainable</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Premium Quality</span>
+        <div class="col-span-full text-center py-16">
+          <div class="enhanced-card max-w-2xl mx-auto p-12 rounded-2xl">
+            <div class="text-6xl mb-6">🛒</div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-4">Online Store Coming Soon</h3>
+            <p class="text-slate-600 mb-8 text-lg leading-relaxed">Get ready to order fresh, sustainably grown mushrooms delivered straight from our smart farm to your door.</p>
+            <div class="flex flex-wrap gap-3 justify-center mb-8">
+              <span class="px-4 py-2 bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-700 rounded-full text-sm font-medium">🚚 Fresh Delivery</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-emerald-100 to-cyan-100 text-emerald-700 rounded-full text-sm font-medium">🏭 Farm Direct</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 rounded-full text-sm font-medium">🌱 Sustainable</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-sm font-medium">⭐ Premium Quality</span>
           </div>
           <button 
-            class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg"
+            class="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
             onclick="alert('Thank you for your interest! We\'ll notify you when our online store launches.')">
-            Notify Me When Available
+            🔔 Notify Me When Available
           </button>
+          </div>
         </div>
       `;
       console.log('🛒 No shop products available, showing coming soon message');
@@ -409,30 +416,35 @@ export class EnhancedHomeLoader {
     const productUrl = this.getProductUrl(product);
 
     return `
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 group w-full max-w-sm">
+      <div class="enhanced-card rounded-2xl overflow-hidden group w-full max-w-sm fade-in-up">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 
             alt="${imageAlt}" 
-            class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
+            class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
           >
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-          ${product.price ? `<div class="absolute top-4 right-4 bg-teal-600 text-white px-2 py-1 rounded-md font-bold text-sm">$${product.price}</div>` : ''}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+          ${product.price ? `<div class="absolute top-4 right-4 bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-3 py-2 rounded-xl font-bold text-sm shadow-lg">$${product.price}</div>` : ''}
+          <div class="absolute bottom-4 left-4">
+            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-slate-700 rounded-full text-xs font-medium">
+              🛒 Available Now
+            </span>
+          </div>
         </div>
-        <div class="p-6">
-          <h3 class="font-bold text-xl mb-2 group-hover:text-teal-600 transition-colors duration-200">
+        <div class="p-8">
+          <h3 class="font-bold text-xl mb-3 group-hover:text-teal-600 transition-colors duration-200">
             ${product.name}
           </h3>
-          <p class="text-slate-600 mb-4 line-clamp-2">${description}</p>
+          <p class="text-slate-600 mb-6 line-clamp-2 leading-relaxed">${description}</p>
           <div class="flex justify-between items-center">
             <a 
               href="${productUrl}" 
-              class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center group"
+              class="inline-flex items-center bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               data-product-id="${product._id || product.id}"
             >
               Shop Now
-              <svg class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </a>
@@ -512,15 +524,17 @@ export class EnhancedHomeLoader {
     // If no dynamic posts, show coming soon message
     if (!posts || posts.length === 0) {
       container.innerHTML = `
-        <div class="col-span-full text-center py-12">
-          <div class="text-6xl mb-4">📝</div>
-          <h3 class="text-xl font-semibold text-slate-800 mb-2">Blog Posts Coming Soon</h3>
-          <p class="text-slate-600 mb-6">We're preparing engaging content about mushroom cultivation and sustainable farming practices.</p>
-          <div class="flex flex-wrap gap-2 justify-center">
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Growing Tips</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Recipes</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Health Benefits</span>
-            <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm">Sustainability</span>
+        <div class="col-span-full text-center py-16">
+          <div class="enhanced-card max-w-2xl mx-auto p-12 rounded-2xl">
+            <div class="text-6xl mb-6">📝</div>
+            <h3 class="text-2xl font-bold text-slate-800 mb-4">Blog Posts Coming Soon</h3>
+            <p class="text-slate-600 mb-8 text-lg leading-relaxed">We're preparing engaging content about mushroom cultivation and sustainable farming practices.</p>
+            <div class="flex flex-wrap gap-3 justify-center">
+              <span class="px-4 py-2 bg-gradient-to-r from-teal-100 to-emerald-100 text-teal-700 rounded-full text-sm font-medium">🌱 Growing Tips</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-emerald-100 to-cyan-100 text-emerald-700 rounded-full text-sm font-medium">🍳 Recipes</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 rounded-full text-sm font-medium">💪 Health Benefits</span>
+              <span class="px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-sm font-medium">♻️ Sustainability</span>
+            </div>
           </div>
         </div>
       `;
@@ -545,33 +559,38 @@ export class EnhancedHomeLoader {
     const authorName = post.author?.name || 'MYCOgenesis Team';
 
     return `
-      <div class="bg-stone-50 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 group w-full max-w-sm">
+      <div class="enhanced-card bg-white rounded-2xl overflow-hidden group w-full max-w-sm fade-in-up">
         <div class="relative overflow-hidden">
           <img 
             src="${imageUrl}" 
             alt="${imageAlt}" 
-            class="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-110"
+            class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
           >
-          <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent group-hover:from-black/40 transition-all duration-300"></div>
+          <div class="absolute top-4 left-4">
+            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-slate-700 rounded-full text-xs font-medium">
+              📚 Article
+            </span>
+          </div>
         </div>
-        <div class="p-6">
-          ${post.category ? `<span class="inline-block text-xs font-semibold text-teal-600 uppercase mb-2">${post.category}</span>` : ''}
-          <h3 class="font-bold text-xl mb-2 group-hover:text-teal-600 transition-colors duration-200 line-clamp-2">
+        <div class="p-8">
+          ${post.category ? `<span class="inline-block text-xs font-semibold text-teal-600 uppercase mb-3 tracking-wider">${post.category}</span>` : ''}
+          <h3 class="font-bold text-xl mb-3 group-hover:text-teal-600 transition-colors duration-200 line-clamp-2 leading-tight">
             ${post.title}
           </h3>
-          <p class="text-slate-600 mb-4 line-clamp-2">${post.excerpt || ''}</p>
-          <div class="flex justify-between items-center text-sm text-slate-500">
+          <p class="text-slate-600 mb-6 line-clamp-2 leading-relaxed">${post.excerpt || ''}</p>
+          <div class="flex justify-between items-center text-sm text-slate-500 mb-4">
             <span>By ${authorName}</span>
             <time datetime="${post.publishedAt}">${publishedDate}</time>
           </div>
           <a 
             href="${postUrl}" 
-            class="inline-flex items-center mt-4 text-teal-600 hover:text-teal-800 font-semibold transition-colors duration-200 group"
+            class="inline-flex items-center text-teal-600 hover:text-teal-800 font-semibold transition-all duration-200 group-hover:translate-x-1"
             data-post-id="${post._id || post.id}"
           >
             Read More 
-            <svg class="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
           </a>
