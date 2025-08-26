@@ -24,6 +24,13 @@
             overflow: hidden;
         }
     </style>
+    <script>
+        // Debug logging
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 Blog page loaded');
+            console.log('📝 Checking Sanity CMS connection...');
+        });
+    </script>
 </head>
 <body class="bg-stone-50 text-slate-800">
 
@@ -170,6 +177,66 @@
     <!-- Environment Configuration -->
     <script src="../js/env-config.js"></script>
 
+    <!-- Blog Content Loader -->
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@sanity/client@6.8.6';
+        import imageUrlBuilder from 'https://esm.sh/@sanity/image-url@1.0.2';
+        import { blogLoader } from '../js/dynamic-content/blog-loader.js';
+
+        // Initialize Sanity globally first
+        const sanityClient = createClient({
+            projectId: 'gae98lpg',
+            dataset: 'production',
+            apiVersion: '2024-01-01',
+            useCdn: true,
+            perspective: 'published'
+        });
+
+        // Create image builder
+        const imageUrl = imageUrlBuilder(sanityClient);
+        
+        // Make available globally
+        window.sanityClient = sanityClient;
+        window.imageUrlBuilder = imageUrl;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('🔄 Testing Sanity connection...');
+                
+                // Test query directly
+                const query = '*[_type == "blogPost"][0...5] { title, slug, excerpt }';
+                const posts = await window.sanityClient.fetch(query);
+                console.log('📝 Found posts:', posts);
+                
+                if (posts && posts.length > 0) {
+                    console.log('✅ Sanity connection successful');
+                    
+                    // Initialize blog loader
+                    console.log('🔄 Initializing blog loader...');
+                    await blogLoader.init();
+                    console.log('✅ Blog loader initialized successfully');
+                } else {
+                    throw new Error('No blog posts found');
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                // Show error in UI
+                const errorDiv = document.getElementById('error-message');
+                if (errorDiv) {
+                    errorDiv.classList.remove('hidden');
+                    errorDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 text-red-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Failed to load blog posts: ${error.message}</span>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+
     <!-- Shared Authentication System -->
     <script type="module">
         import { SharedAuthHandler } from '../js/shared-auth.js';
@@ -223,22 +290,8 @@
         });
     </script>
 
-    <!-- Dynamic Content Loading -->
-    <script type="module">
-        import { BlogLoader } from '../js/dynamic-content/blog-loader.js';
-        
-        // Initialize blog loader when DOM is loaded
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🔄 Initializing blog loader...');
-            try {
-                window.blogLoader = new BlogLoader();
-                await window.blogLoader.initialize();
-                console.log('✅ Blog loader initialized successfully');
-            } catch (error) {
-                console.error('❌ Failed to initialize blog loader:', error);
-            }
-        });
-    </script>
+    <!-- Real-time Content Service -->
+    <script type="module" src="../js/services/real-time-content-service.js"></script>
 
     <!-- Real-time Content Service -->
     <script type="module" src="../js/services/real-time-content-service.js"></script>
