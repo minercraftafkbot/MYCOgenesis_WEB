@@ -2,7 +2,7 @@
 
 import Layout from '../components/Layout';
 import { useProductCatalog, Product } from '../hooks/useProductCatalog';
-import  { client }  from '../lib/sanity';
+import  { sanityClient }  from '../lib/sanity';
 import { useEffect, useState } from 'react'; // Import useEffect and useState for client-side data fetching
 import ProductPreview from '../components/ProductPreview';
 import BlogPostPreview from '../components/BlogPostPreview';
@@ -44,8 +44,9 @@ export default function Home() {
         setBlogPosts(fetchedPosts);
       } catch (err: any) {
         console.error('Error fetching blog posts:', err);
+        console.error('Error details:', err.response || err.message || err); // Log more details
         setBlogPostsError(err);
-      } finally {
+      }  finally {
         setBlogPostsLoading(false);
       }
     }
