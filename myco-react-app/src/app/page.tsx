@@ -1,9 +1,11 @@
-// "use client"; // This page needs client-side features (useProductCatalog)
+ "use client"; // This page needs client-side features (useProductCatalog)
 
 import Layout from '../components/Layout';
 import { useProductCatalog, Product } from '../hooks/useProductCatalog';
-import  {client}  from '../lib/sanity';
+import  { client }  from '../lib/sanity';
 import { useEffect, useState } from 'react'; // Import useEffect and useState for client-side data fetching
+import ProductPreview from '../components/ProductPreview';
+import BlogPostPreview from '../components/BlogPostPreview';
 
 
 // Define the GROQ query for fetching posts
@@ -78,13 +80,9 @@ export default function Home() {
         {productsError && <p className="text-red-500">Error loading featured products: {productsError.message}</p>}
         {products && products.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-            {products.map((product: Product) => ( // Use the imported Product type
-              // Replace with your actual ProductPreview component
-              <div key={product._id} className="border p-4 rounded shadow">
-                <h3>{product.name}</h3>
-                <p>{product.shortDescription}</p>
-              </div>
-            ))}
+            {products.map((product: Product) => (
+              <ProductPreview key={product._id} product={product} />
+              ))}
           </div>
         )}
         {products && products.length === 0 && !productsLoading && !productsError && (
@@ -135,29 +133,18 @@ export default function Home() {
           {blogPostsError && <p className="text-red-500">Error loading blog posts: {blogPostsError.message}</p>}
           {blogPosts && blogPosts.length > 0 ? (
             <ul className="flex flex-col gap-y-4">
-              {blogPosts.map((post: HomePageBlogPost) => ( // Use the HomePageBlogPost interface
-                <li key={post._id} className="hover:underline">
-                  {/* Link to individual post page - we'll set this up later */}
-                  <a href={`/blog/${post.slug.current}`}>
-                    <h3 className="text-xl font-semibold">{post.title}</h3>
-                    {post.publishedAt && (
-                      <p>{new Date(post.publishedAt).toLocaleDateString()}</p>
-                    )}
-                  </a>
-                </li>
-              ))}
+              {blogPosts.map((post: HomePageBlogPost) => (
+              <BlogPostPreview key={post._id} post={post} />
+                ))}
+
             </ul>
-          ) : (
-            !blogPostsLoading && !blogPostsError && <p>No blog posts found.</p>
+          ) : (!blogPostsLoading && !blogPostsError && <p>No blog posts found.</p>
           )}
         </div>
         <div className="text-center">
           {/* Link to full blog page - we'll set this up later */}
-          <a
-            href="/blog"
-            className="mt-12 inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg"
-            >View All Articles</a
-          >
+          <a href="/blog"
+            className="mt-12 inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">View All Articles</a>
         </div>
       </section>
 

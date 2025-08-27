@@ -15,6 +15,7 @@
 - [Deployment Architecture (React)](#-deployment-architecture-react)
 
 ---
+- [SEO & AI SEO Considerations](#-seo--ai-seo-considerations)
 
 ## 🌟 **System Overview**
 
