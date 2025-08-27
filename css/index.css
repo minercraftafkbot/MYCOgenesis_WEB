@@ -18,8 +18,7 @@ body {
     background-size: cover;
     background-position: center;
     opacity: 0;
-    transition: opacity 3s ease-in-out;
-    filter: brightness(1.1) contrast(1.1);
+    transition: opacity 2s ease-in-out;
 }
 
 .hero-bg-image.active {
@@ -27,59 +26,14 @@ body {
 }
 
 .hero-title {
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(13, 148, 136, 0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     max-width: 100%;
     padding: 0 0.5rem;
 }
 
 .hero-description {
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-    line-height: 1.7;
-}
-
-/* Enhanced button styles */
-.btn-primary {
-    background: linear-gradient(135deg, #0d9488, #14b8a6);
-    box-shadow: 0 4px 15px rgba(13, 148, 136, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(13, 148, 136, 0.6);
-}
-
-/* Card hover effects */
-.card-hover {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-/* Smooth scrolling enhancement */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Loading states */
-.loading-shimmer {
-    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-/* Enhanced focus states */
-.focus-ring:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    line-height: 1.6;
 }
 
 /* Media Queries for Hero Section */
