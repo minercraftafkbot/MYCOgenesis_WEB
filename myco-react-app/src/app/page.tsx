@@ -2,8 +2,9 @@
 
 import Layout from '../components/Layout';
 import { useProductCatalog, Product } from '../hooks/useProductCatalog';
-import  { sanityClient }  from '../lib/sanity';
+import { sanityClient } from '../lib/sanity';
 import { useEffect, useState } from 'react'; // Import useEffect and useState for client-side data fetching
+import Link from 'next/link';
 import ProductPreview from '../components/ProductPreview';
 import BlogPostPreview from '../components/BlogPostPreview';
 
@@ -40,12 +41,13 @@ export default function Home() {
       setBlogPostsLoading(true);
       setBlogPostsError(null);
       try {
-        const fetchedPosts: HomePageBlogPost[] = await client.fetch(POSTS_QUERY);
+        const fetchedPosts: HomePageBlogPost[] = await sanityClient.fetch(POSTS_QUERY);
         setBlogPosts(fetchedPosts);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching blog posts:', err);
-        console.error('Error details:', err.response || err.message || err); // Log more details
-        setBlogPostsError(err);
+        const error = err as Error;
+        console.error('Error details:', error.message);
+        setBlogPostsError(error);
       }  finally {
         setBlogPostsLoading(false);
       }
@@ -144,8 +146,8 @@ export default function Home() {
         </div>
         <div className="text-center">
           {/* Link to full blog page - we'll set this up later */}
-          <a href="/blog"
-            className="mt-12 inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">View All Articles</a>
+          <Link href="/blog"
+            className="mt-12 inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 shadow-lg">View All Articles</Link>
         </div>
       </section>
 
