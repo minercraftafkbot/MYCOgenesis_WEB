@@ -1,52 +1,65 @@
-"use client";
 
-import useSanityData from './useSanityData';
+// myco-react-app/src/hooks/useSingleBlogPost.ts
+import { useState, useEffect } from 'react';
+import { sanityClient } from '../lib/sanity';
+import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-interface SingleBlogPost {
+// Define the shape of a single blog post
+export interface SingleBlogPost {
   _id: string;
   title: string;
-  slug: {
-    current: string;
-  };
+  slug: { current: string };
   publishedAt: string;
-  featuredImage?: {
-    asset: {
-      _ref: string;
-      _type: string;
-    };
+  body: any[]; // Portable Text content
+  featuredImage?: SanityImageSource;
+  author: {
+    name: string;
+    image?: SanityImageSource;
   };
-  body?: any[]; // Use 'any[]' for Portable Text or define a more specific type later
-  // Add other relevant blog post fields as needed
+  categories: {
+    title: string;
+    slug: { current: string };
+  }[];
 }
 
-interface UseSingleBlogPostData {
-  post: SingleBlogPost | null;
-  loading: boolean;
-  error: Error | null;
+const SINGLE_POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
+  _id,
+  title,
+  slug,
+  publishedAt,
+  body,
+  featuredImage,
+  "author": author->{name, image},
+  "categories": categories[]->{title, "slug": slug.current}
+}`;
+
+export default function useSingleBlogPost(slug: string) {
+  const [post, setPost] = useState<SingleBlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (!slug) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchPost() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await sanityClient.fetch<SingleBlogPost>(SINGLE_POST_QUERY, { slug });
+        setPost(data);
+      } catch (err: any) {
+        console.error("Failed to fetch blog post:", err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchPost();
+  }, [slug]);
+
+  return { post, loading, error };
 }
-
-/**
- * Custom React hook to fetch a single blog post from Sanity by slug.
- *
- * @param slug - The slug of the blog post.
- * @returns An object containing the blog post data, loading state, and error.
- */
-function useSingleBlogPost(slug: string | null): UseSingleBlogPostData {
-  const query = `*[_type == "post" && slug.current == $slug][0]{
-    _id,
-    title,
-    slug,
-    publishedAt,
-    featuredImage,
-    body
-    // Add other fields here
-  }`;
-
-  const params = { slug };
-
-  const { data, loading, error } = useSanityData<SingleBlogPost | null>(query, params);
-
-  return { post: data, loading, error };
-}
-
-export default useSingleBlogPost;

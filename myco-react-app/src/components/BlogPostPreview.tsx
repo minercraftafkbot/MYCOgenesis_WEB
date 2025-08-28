@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link'; // Import the Link component
 
 interface BlogPostPreviewProps {
   post: {
@@ -14,17 +15,18 @@ interface BlogPostPreviewProps {
 
 const BlogPostPreview: React.FC<BlogPostPreviewProps> = ({ post }) => {
   return (
-    <div className="border p-4 rounded shadow">
-      <h3 className="text-xl font-semibold">{post.title}</h3>
-      {post.excerpt && <p className="mt-2 text-slate-600">{post.excerpt}</p>}
-      {post.publishedAt && (
-        <p className="mt-2 text-sm text-slate-500">
-          Published: {new Date(post.publishedAt).toLocaleDateString()}
-        </p>
-      )}
-      {/* Link to full post page will be added later */}
-      {/* <a href={`/blog/${post.slug.current}`}>Read More</a> */}
-    </div>
+    <Link href={`/blog/${post.slug.current}`} passHref>
+      <div className="border p-4 rounded shadow hover:shadow-lg transition-shadow duration-200 cursor-pointer">
+        <h3 className="text-xl font-semibold">{post.title}</h3>
+        {post.excerpt && <p className="mt-2 text-slate-600">{post.excerpt}</p>}
+        {post.publishedAt && (
+          <p className="mt-2 text-sm text-slate-500">
+            Published: {new Date(post.publishedAt).toLocaleDateString()}
+          </p>
+        )}
+        <div className="mt-4 text-teal-600 hover:text-teal-700 font-semibold">Read More &rarr;</div>
+      </div>
+    </Link>
   );
 };
 

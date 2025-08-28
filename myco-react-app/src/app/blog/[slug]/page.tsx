@@ -1,146 +1,112 @@
-{/* myco-react-app/src/app/blog/[slug]/page.tsx */}
-"use client"; // Add this at the very top
+
+// myco-react-app/src/app/blog/[slug]/page.tsx
+"use client";
+
 import { Metadata } from 'next';
-import { client } from '../../../lib/sanity'; // Import Sanity client
+import { sanityClient } from '../../../lib/sanity'; 
 import Layout from '../../../components/Layout';
-import useSingleBlogPost from '../../../hooks/useSingleBlogPost'; // Import the hook
-// You'll also need to import the type definition for a single blog post if you create one in the hook file
-
+import useSingleBlogPost, { SingleBlogPost } from '../../../hooks/useSingleBlogPost';
 import imageUrlBuilder from '@sanity/image-url';
-import { SanityImageSource } from '@sanity/image-url/lib/types/types'; // For type safety
-
+import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 import { PortableText } from '@portabletext/react';
+import Link from 'next/link';
 
-
-
-
-// Define a type for the metadata we need
+// --- Metadata Generation ---
+// This part runs on the server to generate metadata for the page head.
 interface BlogPostMetadata {
   title: string;
   seo?: {
     metaTitle?: string;
     metaDescription?: string;
   };
-  // Add other fields you might need for metadata generation (e.g., excerpt for description fallback)
+  excerpt?: string;
 }
- // Function to generate dynamic metadata
- export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
 
-  // Fetch the blog post data to get title and SEO fields
-  const post: BlogPostMetadata = await client.fetch(
-    `*[_type == "post" && slug.current == $slug][0]{ title, seo }`,
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = params;
+  const post: BlogPostMetadata = await sanityClient.fetch(
+    `*[_type == "post" && slug.current == $slug][0]{ title, seo, excerpt }`,
     { slug }
   );
 
   if (!post) {
-    return {
-      title: 'Blog Post Not Found',
-      description: 'The requested blog post could not be found.',
-    };
+    return { title: 'Post Not Found' };
   }
 
   return {
-    title: post.seo?.metaTitle || post.title || 'Blog Post',
-    description: post.seo?.metaDescription || `Read about ${post.title}`,
+    title: post.seo?.metaTitle || post.title,
+    description: post.seo?.metaDescription || post.excerpt || 'Read this blog post from Myco.',
   };
 }
-////////////////////////////////////////////////////////--image builder--////////////////////////////////////////////////////////////////
 
-const builder = imageUrlBuilder(client);
+// --- Image URL Builder ---
+const builder = imageUrlBuilder(sanityClient);
 
-export function urlFor(source: SanityImageSource) {
+function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
-
-
-
-///////////////////////////////////////////////////////--Blog Post Page--///////////////////////////////////////////////////////////////
-
+// --- Blog Post Page Component ---
 interface BlogPostPageProps {
   params: {
     slug: string;
   };
 }
+
 export default function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = params;
-
-  // Use the hook to fetch the blog post data
   const { post, loading, error } = useSingleBlogPost(slug);
 
-  // Conditional rendering based on loading, error, and data
   if (loading) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center">
-          <p>Loading blog post...</p>
-        </div>
-      </Layout>
-    );
+    return <Layout><div className="container mx-auto px-6 py-8 text-center"><p>Loading...</p></div></Layout>;
   }
 
   if (error) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center text-red-500">
-          <p>Error loading blog post: {error.message}</p>
-        </div>
-      </Layout>
-    );
+    return <Layout><div className="container mx-auto px-6 py-8 text-center text-red-500"><p>Error: {error.message}</p></div></Layout>;
   }
 
-  // If no post is found for the slug
   if (!post) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center">
-          <h1 className="text-2xl font-bold">Blog Post Not Found</h1>
-          <p className="mt-4">The blog post with slug "{slug}" could not be found.</p>
-        </div>
-      </Layout>
-    );
+    return <Layout><div className="container mx-auto px-6 py-8 text-center"><p>Post not found.</p></div></Layout>;
   }
 
-  // If the post data is loaded, display it
   return (
     <Layout>
-      <div className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-        {post.publishedAt && (
-          <p className="text-slate-600 text-sm mb-6">
-            Published on {new Date(post.publishedAt).toLocaleDateString()}
-          </p>
-        )}
-        {/* Display featured image if available */}
-        {/* You'll need to use the @sanity/image-url library here later */}
+      <article className="container mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold mb-4 text-center">{post.title}</h1>
+        <div className="text-center mb-8 text-slate-500">
+          <span>Published on {new Date(post.publishedAt).toLocaleDateString()}</span>
+          {post.author && <span> by {post.author.name}</span>}
+        </div>
+
         {post.featuredImage && (
-            <div className="mb-8">
-             <img
-                src={urlFor(post.featuredImage).url() || ''} // Use urlFor to get the image URL
-                alt={post.title || 'Blog post featured image'} // Add a fallback alt text
-                className="w-full h-auto rounded-lg"
-                />
-            </div>
-           )}
-           
-            {/* AdSense Ad Unit (Example Placement) */}
-            <div className="my-8"> {/* Add some margin around the ad unit */}
-              <ins className="adsbygoogle"
-                   style={{ display: 'block' }} // Or use Tailwind classes
-                   data-ad-client="ca-pub-YOUR_ADSENSE_PUBLISHER_ID"
-                   data-ad-slot="YOUR_AD_UNIT_SLOT_ID"></ins>
-              <script>
-                   (adsbygoogle = window.adsbygoogle || []).push({});
-              </script>
-            </div>
+          <div className="mb-8">
+            <img
+              src={urlFor(post.featuredImage).width(1200).url()}
+              alt={post.title}
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
+        )}
 
-      <div className="prose max-w-none">
-          {/* Render Portable Text body */}
+        <div className="prose lg:prose-xl max-w-none mx-auto">
           {post.body && <PortableText value={post.body} />}
-      </div>
+        </div>
 
-      </div>
+        {post.categories && post.categories.length > 0 && (
+          <div className="mt-12 text-center">
+            <h4 className="font-semibold">Categories:</h4>
+            <div className="flex flex-wrap justify-center gap-2 mt-2">
+              {post.categories.map((category) => (
+                <Link href={`/category/${category.slug.current}`} key={category.slug.current}>
+                  <span className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full text-sm hover:bg-slate-300 transition-colors duration-200">
+                    {category.title}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </article>
     </Layout>
   );
 }
