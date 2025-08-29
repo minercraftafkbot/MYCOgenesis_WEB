@@ -1,47 +1,50 @@
 
 // myco-react-app/src/app/blog/[slug]/page.tsx
-// This is now a Server Component. The "use client" directive has been removed.
-
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { sanityClient } from '../../../lib/sanity';
-import PostPage from './PostPage'; // Import the new Client Component
+import PostPage from './PostPage';
+import { SingleBlogPost } from '../../../types/sanity';
 
-// --- Metadata Generation (Server-side) ---
-interface BlogPostMetadata {
-  title: string;
-  seo?: {
-    metaTitle?: string;
-    metaDescription?: string;
-  };
-  excerpt?: string;
+export const dynamic = 'force-dynamic';
+
+export async function generateStaticParams() {
+  const posts: { slug: { current: string } }[] = await sanityClient.fetch(
+    `*[_type == "post" && defined(slug.current)]{ "slug": slug }`
+  );
+  return posts.map((post) => ({ slug: post.slug.current }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
-  const post: BlogPostMetadata = await sanityClient.fetch(
-    `*[_type == "post" && slug.current == $slug][0]{ title, seo, excerpt }`,
+async function fetchBlogPost(slug: string): Promise<SingleBlogPost> {
+  const post = await sanityClient.fetch(
+    `*[_type == "post" && slug.current == $slug][0]{
+      _id, title, slug, publishedAt, body, featuredImage,
+      "author": author->{name, image},
+      "categories": categories[]->{_id, title, "slug": slug.current}
+    }`,
     { slug }
   );
-
   if (!post) {
-    return { title: 'Post Not Found' };
+    notFound();
   }
+  return post;
+}
 
+interface PageProps { 
+  params: { slug: string };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = params; // Explicitly destructure slug
+  const post = await fetchBlogPost(slug);
   return {
-    title: post.seo?.metaTitle || post.title,
-    description: post.seo?.metaDescription || post.excerpt || 'Read this blog post from Myco.',
+    title: post.title,
+    description: `Read the blog post: ${post.title}`,
   };
 }
 
-// --- Page Component (Server-side) ---
-interface BlogPostPageProps {
-  params: {
-    slug: string;
-  };
-}
-
-// This is the main component for the route. It's a Server Component.
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  // It receives params from the URL and passes the slug to the Client Component.
-  return <PostPage slug={params.slug} />;
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = params; // Explicitly destructure slug
+  const post = await fetchBlogPost(slug);
+  return <PostPage post={post} />;
 }

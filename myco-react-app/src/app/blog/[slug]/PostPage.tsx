@@ -1,6 +1,6 @@
 
 // myco-react-app/src/app/blog/[slug]/PostPage.tsx
-"use client"; // This is now a dedicated Client Component
+"use client";
 
 import Link from 'next/link';
 import { PortableText } from '@portabletext/react';
@@ -8,35 +8,23 @@ import imageUrlBuilder from '@sanity/image-url';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
 import Layout from '../../../components/Layout';
-import useSingleBlogPost from '../../../hooks/useSingleBlogPost';
 import { sanityClient } from '../../../lib/sanity';
+import { SingleBlogPost } from '../../../types/sanity'; // Import the shared type
 
 // --- Image URL Builder ---
 const builder = imageUrlBuilder(sanityClient);
-
 function urlFor(source: SanityImageSource) {
   return builder.image(source);
 }
 
 // --- Blog Post Page Component ---
+// This is now a simple presentational component that receives the post data as a prop.
 interface PostPageProps {
-  slug: string;
+  post: SingleBlogPost;
 }
 
-export default function PostPage({ slug }: PostPageProps) {
-  const { post, loading, error } = useSingleBlogPost(slug);
-
-  if (loading) {
-    return <Layout><div className="container mx-auto px-6 py-8 text-center"><p>Loading...</p></div></Layout>;
-  }
-
-  if (error) {
-    return <Layout><div className="container mx-auto px-6 py-8 text-center text-red-500"><p>Error: {error.message}</p></div></Layout>;
-  }
-
-  if (!post) {
-    return <Layout><div className="container mx-auto px-6 py-8 text-center"><p>Post not found.</p></div></Layout>;
-  }
+export default function PostPage({ post }: PostPageProps) {
+  // All the data is now passed in directly, so no more loading or error states are needed here.
 
   return (
     <Layout>
@@ -66,7 +54,7 @@ export default function PostPage({ slug }: PostPageProps) {
             <h4 className="font-semibold">Categories:</h4>
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {post.categories.map((category) => (
-                <Link href={`/category/${category.slug.current}`} key={category.slug.current}>
+                <Link href={`/category/${category.slug.current}`} key={category._id}>
                   <span className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full text-sm hover:bg-slate-300 transition-colors duration-200">
                     {category.title}
                   </span>
