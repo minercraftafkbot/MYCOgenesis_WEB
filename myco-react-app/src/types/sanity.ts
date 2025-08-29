@@ -44,6 +44,7 @@ export interface SingleBlogPost {
     publishedAt: string;
     body: any; // Portable Text
     featuredImage?: any; // Sanity Image
+    excerpt?: string; // Add this line
     author: {
         name: string;
         image?: any; // Sanity Image

@@ -1,117 +1,112 @@
 
-// myco-react-app/src/app/blog/[slug]/page.tsx
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { sanityClient, urlFor } from '../../../lib/sanity';
-import PostPage from './PostPage';
-import { SingleBlogPost } from '../../../types/sanity';
+import { sanityClient, urlFor } from '@/lib/sanity'; // Corrected import
+import { SingleBlogPost } from '@/types/sanity'; 
+import { PortableText } from '@portabletext/react';
+import Image from 'next/image';
+import { Metadata, ResolvingMetadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+type Props = {
+    params: { slug: string };
+};
 
-export async function generateStaticParams() {
-  const posts: { slug: { current: string } }[] = await sanityClient.fetch(
-    `*[_type == "post" && defined(slug.current)]{ "slug": slug }`
-  );
-  return posts.map((post) => ({ slug: post.slug.current }));
-}
-
-async function fetchBlogPost(slug: string): Promise<SingleBlogPost> {
-  const post = await sanityClient.fetch(
+// Generate metadata for the page
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const post: SingleBlogPost = await sanityClient.fetch(
     `*[_type == "post" && slug.current == $slug][0]{
-      _id, title, slug, publishedAt, body, featuredImage,
-      "author": author->{name, image},
-      "categories": categories[]->{_id, title, "slug": slug.current}
+        title, excerpt, featuredImage
     }`,
-    { slug }
+    { slug: params.slug }
   );
-  if (!post) {
-    notFound();
-  }
-  return post;
-}
 
-interface PageProps { 
-  params: { slug: string };
-}
+  const previousImages = (await parent).openGraph?.images || [];
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = params;
-  const post = await fetchBlogPost(slug);
-
-  const imageUrl = post.featuredImage ? urlFor(post.featuredImage).width(1200).height(630).url() : '/placeholder.jpg';
-  const postUrl = `https://your-website.com/blog/${slug}`; // Replace with your actual domain
+  const imageUrl = post.featuredImage ? urlFor(post.featuredImage).width(1200).height(630).url() : '';
 
   return {
-    title: post.title,
-    description: `Read the blog post: ${post.title}`,
-    alternates: {
-      canonical: postUrl,
-    },
+    title: `${post.title} | MYCOgenesis Blog`,
+    description: post.excerpt || (await parent).description,
     openGraph: {
-      title: post.title,
-      description: `Read the blog post: ${post.title}`,
-      url: postUrl,
-      siteName: 'Your Site Name', // Replace with your site name
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
-      type: 'article',
-      publishedTime: post.publishedAt,
-      authors: [post.author.name],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: `Read the blog post: ${post.title}`,
-      images: [imageUrl],
+        images: [imageUrl, ...previousImages],
     },
   };
 }
 
-export default async function BlogPostPage({ params }: PageProps) {
-  const { slug } = params;
-  const post = await fetchBlogPost(slug);
-  const postUrl = `https://your-website.com/blog/${slug}`; // Replace with your actual domain
-  const imageUrl = post.featuredImage ? urlFor(post.featuredImage).url() : '/placeholder.jpg';
+async function getPost(slug: string): Promise<SingleBlogPost> {
+    const post = await sanityClient.fetch(
+        `*[_type == "post" && slug.current == $slug][0]{
+            _id, title, slug, publishedAt, body, featuredImage, excerpt,
+            author->{name, image},
+            categories[]->{title}
+        }`,
+        { slug }
+    );
+    return post;
+}
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    'headline': post.title,
-    'name': post.title,
-    'image': imageUrl,
-    'author': {
-      '@type': 'Person',
-      'name': post.author.name,
+// Components for rendering Portable Text
+const ptComponents = {
+    types: {
+        image: ({ value }: { value: any }) => {
+            if (!value?.asset?._ref) {
+                return null;
+            }
+            return (
+                <div className="my-8">
+                    <Image
+                        src={urlFor(value).url()}
+                        alt={value.alt || 'Blog post image'}
+                        width={800}
+                        height={450}
+                        className="rounded-lg"
+                    />
+                </div>
+            );
+        },
     },
-    'publisher': {
-      '@type': 'Organization',
-      'name': 'Your Site Name', // Replace with your site name
-      'logo': {
-        '@type': 'ImageObject',
-        'url': 'https://your-website.com/logo.png', // Replace with your logo URL
-      },
-    },
-    'url': postUrl,
-    'datePublished': post.publishedAt,
-    'dateCreated': post.publishedAt,
-    'dateModified': post.publishedAt, // Or a separate 'updatedAt' field if you have one
-    'description': `Read the blog post: ${post.title}`,
-    'articleBody': 'The main content of the article.', // You could potentially serialize the 'body' for this
-  };
+};
 
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <PostPage post={post} />
-    </>
-  );
+export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+    const post = await getPost(params.slug);
+
+    if (!post) {
+        return <div>Post not found</div>;
+    }
+
+    return (
+        <article className="bg-white py-16 sm:py-24">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">{post.title}</h1>
+                    <p className="mt-4 text-lg text-gray-600">Published on {new Date(post.publishedAt).toLocaleDateString()}</p>
+                     {post.author && (
+                        <div className="mt-6 flex justify-center items-center">
+                            {post.author.image && 
+                                <Image src={urlFor(post.author.image).width(40).height(40).url()} alt={post.author.name} className="rounded-full h-10 w-10 mr-4" width={40} height={40}/>
+                            }
+                            <span>By {post.author.name}</span>
+                        </div>
+                    )}
+                </div>
+                
+                {post.featuredImage && (
+                    <div className="mb-12">
+                        <Image 
+                            src={urlFor(post.featuredImage).url()} 
+                            alt={post.title} 
+                            width={1200} 
+                            height={675} 
+                            className="rounded-lg shadow-lg"
+                        />
+                    </div>
+                )}
+
+                <div className="prose prose-lg max-w-none prose-teal">
+                    <PortableText value={post.body} components={ptComponents} />
+                </div>
+            </div>
+        </article>
+    );
 }
