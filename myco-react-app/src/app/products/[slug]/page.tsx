@@ -1,20 +1,10 @@
-{/* myco-react-app/src/app/products/[slug]/page.tsx */}
-"use client"; 
-import Layout from '../../../../../components/Layout';
-import useSingleProduct, { SingleProduct } from '../../../../../hooks/useSingleProduct'; // Import the hook and type
-import imageUrlBuilder from '@sanity/image-url'; // Import image builder if you want to display images
-import { SanityImageSource } from '@sanity/image-url/lib/types/types'; // For image type safety
-import { client } from '../../../../../lib/sanity'; // Import the Sanity client for image builder
 
-
-// Create an image URL builder instance
-const builder = imageUrlBuilder(client);
-
-// Helper function to generate image URLs
-function urlFor(source: SanityImageSource) {
-  return builder.image(source);
-}
-
+// myco-react-app/src/app/products/[slug]/page.tsx
+import { sanityClient, urlFor } from '../../../lib/sanity';
+import { Product } from '../../../types/sanity';
+import { PortableText } from '@portabletext/react';
+import { Metadata } from 'next';
+import Image from 'next/image';
 
 interface ProductPageProps {
   params: {
@@ -22,77 +12,77 @@ interface ProductPageProps {
   };
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const { slug } = params;
+async function getProduct(slug: string): Promise<Product | null> {
+  const product = await sanityClient.fetch(
+    `*[_type == "product" && slug.current == $slug][0]{
+      _id,
+      title,
+      slug,
+      description,
+      defaultProductVariant,
+      "mainImage": defaultProductVariant.images[0]
+    }`,
+    { slug }
+  );
+  return product;
+}
 
-  // Use the hook to fetch the product data
-  const { product, loading, error } = useSingleProduct(slug); // Correct destructuring
+export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+    const product = await getProduct(params.slug);
+    return {
+        title: `${product?.title || 'Product'} | MYCOgenesis`,
+        description: `Details for ${product?.title || 'Product'}`
+    }
+}
 
 
-  // Conditional rendering based on loading, error, and data
-  if (loading) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center">
-          <p>Loading product...</p>
-        </div>
-      </Layout>
-    );
-  }
+export default async function ProductPage({ params }: ProductPageProps) {
+  const product = await getProduct(params.slug);
 
-  if (error) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center text-red-500">
-          <p>Error loading product: {error.message}</p>
-        </div>
-      </Layout>
-    );
-  }
-
-  // If no product is found for the slug
   if (!product) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-6 py-8 text-center">
-          <h1 className="text-2xl font-bold">Product Not Found</h1>
-          <p className="mt-4">The product with slug "{slug}" could not be found.</p>
-        </div>
-      </Layout>
-    );
+    return <div>Product not found</div>;
   }
 
-  // If the product data is loaded, display it
   return (
-    <Layout>
-      <div className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-
-        {/* Display product images if available */}
-        {product.images && product.images.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {product.images.map((image, index) => (
-              <img
-                key={index} // Use index as key for array map
-                src={urlFor(image).url() || ''} // Use urlFor to get the image URL
-                alt={`${product.name} Image ${index + 1}`} // Add descriptive alt text
-                className="w-full h-auto rounded-lg object-cover"
-              />
-            ))}
+    <div className="bg-white">
+      <div className="max-w-4xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
+          
+          <div>
+            {product.mainImage && (
+                 <Image
+                    src={urlFor(product.mainImage).width(600).height(600).url()}
+                    alt={product.title || 'Product image'}
+                    width={600}
+                    height={600}
+                    className="w-full h-auto object-cover rounded-lg shadow-md"
+                />
+            )}
           </div>
-        )}
 
-        <div className="prose max-w-none">
-          <p className="text-lg font-semibold mb-4">{product.shortDescription}</p>
-          {/* Render full description if available - assuming it's rich text (Portable Text) */}
-          {/* You'll need @portabletext/react here if description is Portable Text */}
-          {product.description && <p>{product.description}</p>} {/* Placeholder for now */}
+          <div className="mt-8 md:mt-0">
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">{product.title}</h1>
+            
+            {product.defaultProductVariant?.price && (
+                <p className="text-2xl text-gray-900 mt-2">${product.defaultProductVariant.price}</p>
+            )}
 
-          {/* Display other product details */}
-          {product.availability && <p>Availability: {product.availability}</p>}
-          {/* Add sections for healthBenefits, cookingTips, nutritionalInfo as needed */}
+            <div className="mt-6 prose prose-lg text-gray-700">
+                {product.description && <PortableText value={product.description} />}
+            </div>
+
+            <div className="mt-10">
+                <button 
+                    type="submit"
+                    className="w-full bg-teal-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                >
+                    Add to Cart
+                </button>
+            </div>
+          </div>
+
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }

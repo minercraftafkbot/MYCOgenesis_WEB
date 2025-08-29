@@ -29,7 +29,11 @@ function Header() {
                 Shop
               </Link>
             </li>
-            {/* Add more navigation links as needed */}
+            <li>
+              <Link href="/business/overview" className="hover:text-teal-200 transition-colors">
+                Business
+              </Link>
+            </li>
           </ul>
         </nav>
 

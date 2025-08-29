@@ -1,75 +1,49 @@
+
 // myco-react-app/src/app/blog/page.tsx
+import { sanityClient } from '../../lib/sanity';
+import { Post } from '../../types/sanity';
+import BlogPostPreview from '../../components/BlogPostPreview';
+import { Metadata } from 'next';
 
-"use client"; // This page will use client-side hooks/fetching
+export const metadata: Metadata = {
+    title: 'Blog | MYCOgenesis',
+    description: 'Explore the world of mycology, from gourmet mushrooms to cultivation techniques.',
+};
 
-import { useEffect, useState } from 'react';
-import Layout from '../../components/Layout'; // Adjust path as needed
-import BlogPostPreview from '../../components/BlogPostPreview'; // Adjust path as needed
-import { sanityClient } from '../../lib/sanity'; // Adjust path as needed
-
-
-// Define the GROQ query for fetching all posts
-const ALL_POSTS_QUERY = `*[
-  _type == "post"
-  && defined(slug.current)
-]|order(publishedAt desc){_id, title, slug, publishedAt, excerpt}`; // Include excerpt for the preview
-
-
-interface BlogPost {
-  _id: string;
-  title: string;
-  slug: {
-    current: string;
-  };
-  publishedAt: string;
-  excerpt?: string; // Add excerpt to the type
+async function getPosts(): Promise<Post[]> {
+  const posts = await sanityClient.fetch(
+    `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){
+      _id,
+      title,
+      slug,
+      publishedAt,
+      "excerpt": body[0].children[0].text
+    }`
+  );
+  return posts;
 }
 
-
-export default function BlogListPage() {
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchAllBlogPosts() {
-      setLoading(true);
-      setError(null);
-      try {
-        const fetchedPosts: BlogPost[] = await sanityClient.fetch(ALL_POSTS_QUERY);
-        setBlogPosts(fetchedPosts);
-      } catch (err: unknown) {
-        console.error('Error fetching all blog posts:', err);
-        const fetchError = err as Error;
-        console.error('Error details:', fetchError.message);
-        setError(fetchError);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchAllBlogPosts();
-  }, []); // Empty dependency array means this effect runs once on mount
-
+export default async function BlogPage() {
+  const posts = await getPosts();
 
   return (
-    <Layout>
-      <div className="container mx-auto px-6 py-8 text-center">
-        <h1 className="text-3xl font-bold mb-12">All Blog Articles</h1>
+    <div className="bg-white">
+        <div className="max-w-3xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+                <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
+                    From the Myco-Verse
+                </h1>
+                <p className="mt-4 text-xl text-gray-600">
+                    Your source for all things mycology. Tips, tricks, and fungal findings.
+                </p>
+            </div>
 
-        {loading && <p>Loading blog posts...</p>}
-        {error && <p className="text-red-500">Error loading blog posts: {error.message}</p>}
-
-        {blogPosts && blogPosts.length > 0 ? (
-          <ul className="flex flex-col gap-y-6">
-            {blogPosts.map((post: BlogPost) => (
-              <BlogPostPreview key={post._id} post={post} />
-            ))}
-          </ul>
-        ) : (
-          !loading && !error && <p>No blog posts found.</p>
-        )}
-      </div>
-    </Layout>
+            <div className="space-y-8">
+                {posts.map((post) => (
+                    <BlogPostPreview key={post._id} post={post} />
+                ))}
+            </div>
+        </div>
+    </div>
   );
 }

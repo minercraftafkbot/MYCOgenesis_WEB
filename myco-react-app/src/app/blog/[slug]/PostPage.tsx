@@ -7,7 +7,6 @@ import { PortableText } from '@portabletext/react';
 import imageUrlBuilder from '@sanity/image-url';
 import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-import Layout from '../../../components/Layout';
 import { sanityClient } from '../../../lib/sanity';
 import { SingleBlogPost } from '../../../types/sanity'; // Import the shared type
 
@@ -27,7 +26,6 @@ export default function PostPage({ post }: PostPageProps) {
   // All the data is now passed in directly, so no more loading or error states are needed here.
 
   return (
-    <Layout>
       <article className="container mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold mb-4 text-center">{post.title}</h1>
         <div className="text-center mb-8 text-slate-500">
@@ -54,7 +52,7 @@ export default function PostPage({ post }: PostPageProps) {
             <h4 className="font-semibold">Categories:</h4>
             <div className="flex flex-wrap justify-center gap-2 mt-2">
               {post.categories.map((category) => (
-                <Link href={`/category/${category.slug.current}`} key={category._id}>
+                <Link href={`/category/${category.slug}`} key={category._id}>
                   <span className="bg-slate-200 text-slate-800 px-3 py-1 rounded-full text-sm hover:bg-slate-300 transition-colors duration-200">
                     {category.title}
                   </span>
@@ -64,6 +62,5 @@ export default function PostPage({ post }: PostPageProps) {
           </div>
         )}
       </article>
-    </Layout>
   );
 }

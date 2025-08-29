@@ -1,10 +1,18 @@
-import { createClient } from '@sanity/client';
 
-    console.log('Sanity Project ID:', process.env.NEXT_PUBLIC_SANITY_PROJECT_ID); // Add this line
+// myco-react-app/src/lib/sanity.ts
+import { createClient } from 'next-sanity';
+import imageUrlBuilder from '@sanity/image-url';
+import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-    export const sanityClient = createClient({
-      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || '',
-      apiVersion: 'v2024-01-01', // use a UTC date in YYYY-MM-DD format
-      useCdn: true, // use a CDN to fetch data wherever possible
-    });
+export const sanityClient = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'p72oaldi',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  useCdn: process.env.NODE_ENV === 'production',
+  apiVersion: '2024-03-20',
+});
+
+const builder = imageUrlBuilder(sanityClient);
+
+export function urlFor(source: SanityImageSource) {
+  return builder.image(source);
+}
