@@ -9,10 +9,10 @@ import { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
 import Layout from '../../../components/Layout';
 import useSingleBlogPost from '../../../hooks/useSingleBlogPost';
-import { client } from '../../../lib/sanity';
+import { sanityClient } from '../../../lib/sanity';
 
 // --- Image URL Builder ---
-const builder = imageUrlBuilder(client);
+const builder = imageUrlBuilder(sanityClient);
 
 function urlFor(source: SanityImageSource) {
   return builder.image(source);
