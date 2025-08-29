@@ -1,3 +1,4 @@
+
 import useSanityData from './useSanityData';
 
 export interface Product {
@@ -27,6 +28,7 @@ interface ProductCatalogOptions {
   category?: string;
   isFeatured?: boolean;
   limit?: number;
+  filterByAvailability?: boolean;
 }
 
 interface ProductCatalogData {
@@ -43,7 +45,7 @@ interface ProductCatalogData {
  * @returns An object containing the product data, loading state, and error.
  */
 export function useProductCatalog(options: ProductCatalogOptions = {}): ProductCatalogData {
-  const { category, isFeatured, limit } = options;
+  const { category, isFeatured, limit, filterByAvailability } = options;
 
   let query = `*[_type == "product"`;
   const params: { [key: string]: any } = {};
@@ -56,6 +58,10 @@ export function useProductCatalog(options: ProductCatalogOptions = {}): ProductC
   if (isFeatured !== undefined) {
     query += ` && isFeatured == $isFeatured`;
     params.isFeatured = isFeatured;
+  }
+
+  if (filterByAvailability !== undefined) {
+    query += ` && availability == 'available'`;
   }
 
   query += `] | order(sortOrder asc) {

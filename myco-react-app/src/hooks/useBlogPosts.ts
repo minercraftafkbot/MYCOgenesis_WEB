@@ -1,9 +1,6 @@
 
-// myco-react-app/src/hooks/useBlogPosts.ts
-import { useState, useEffect } from 'react';
-import { sanityClient } from '../lib/sanity'; 
+import useSanityData from './useSanityData';
 
-// Define the shape of the data for a blog post preview
 export interface BlogPost {
   _id: string;
   title: string;
@@ -11,37 +8,28 @@ export interface BlogPost {
   publishedAt: string;
 }
 
-// Define the GROQ query to fetch a list of posts
-const BLOG_POSTS_QUERY = `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){
-    _id,
-    title,
-    slug,
-    publishedAt
-  }`;
+interface BlogPostsOptions {
+    limit?: number;
+}
 
-export default function useBlogPosts() {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-      try {
-        // CORRECTED: from 'client' to 'sanityClient'
-        const data = await sanityClient.fetch<BlogPost[]>(BLOG_POSTS_QUERY);
-        setPosts(data);
-      } catch (err: any) {
-        console.error("Failed to fetch blog posts:", err);
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
+export default function useBlogPosts(options: BlogPostsOptions = {}) {
+  const { limit } = options;
+  
+  // Base query
+  let query = `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){\n    _id,\n    title,\n    slug,\n    publishedAt\n  }`;
 
-    fetchPosts();
-  }, []); // Empty dependency array means this runs once on mount
+  const params: { [key: string]: any } = {};
 
-  return { posts, loading, error };
+  // Apply limit if provided
+  if (limit) {
+    // GROQ slice is inclusive, so it's [0...limit]
+    query += `[0...$limit]`;
+    params.limit = limit;
+  }
+  
+  // Use the generic data fetching hook
+  const { data, loading, error } = useSanityData<BlogPost[]>(query, params);
+
+  return { posts: data || [], loading, error };
 }

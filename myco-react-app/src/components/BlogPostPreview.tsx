@@ -1,32 +1,28 @@
+
+// myco-react-app/src/components/BlogPostPreview.tsx
 import React from 'react';
-import Link from 'next/link'; // Import the Link component
+import Link from 'next/link';
+import { BlogPost } from '../hooks/useBlogPosts';
 
 interface BlogPostPreviewProps {
-  post: {
-    _id: string;
-    title: string;
-    slug: {
-      current: string;
-    };
-    excerpt?: string;
-    publishedAt: string;
-  };
+  post: BlogPost;
 }
 
 const BlogPostPreview: React.FC<BlogPostPreviewProps> = ({ post }) => {
+  const { title, slug, publishedAt } = post;
+  const publishedDate = new Date(publishedAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   return (
-    <Link href={`/blog/${post.slug.current}`} passHref>
-      <div className="border p-4 rounded shadow hover:shadow-lg transition-shadow duration-200 cursor-pointer">
-        <h3 className="text-xl font-semibold">{post.title}</h3>
-        {post.excerpt && <p className="mt-2 text-slate-600">{post.excerpt}</p>}
-        {post.publishedAt && (
-          <p className="mt-2 text-sm text-slate-500">
-            Published: {new Date(post.publishedAt).toLocaleDateString()}
-          </p>
-        )}
-        <div className="mt-4 text-teal-600 hover:text-teal-700 font-semibold">Read More &rarr;</div>
+    (<Link href={`/blog/${slug?.current}`}>
+      <div className="border p-4 rounded-lg shadow-sm bg-white flex flex-col items-start text-left cursor-pointer hover:shadow-lg transition-shadow duration-200 h-full">
+        <h3 className="text-lg font-semibold text-slate-800 mb-2">{title}</h3>
+        <p className="text-sm text-gray-500 mt-auto">{publishedDate}</p>
       </div>
-    </Link>
+    </Link>)
   );
 };
 
