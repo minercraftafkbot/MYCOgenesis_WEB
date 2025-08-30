@@ -172,15 +172,15 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="order-1 lg:order-2">
-              <div className="relative">
+              <div className="relative p-4">
                 <Image
                   src="/images/home_page/oyster_hand_holding_substrate.png"
                   alt="Hands holding mushroom substrate"
-                  className="rounded-xl shadow-2xl hover:shadow-3xl transition-shadow duration-300"
+                  className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
                   width={600}
                   height={400}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
+                <div className="absolute inset-4 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
               </div>
             </div>
           </div>
@@ -230,12 +230,12 @@ export default function HomePage() {
                 <li><strong>Remote Monitoring:</strong> All data is streamed to a cloud dashboard, for management from anywhere, anytime.</li>
               </ul>
             </div>
-            <div>
+            <div className="p-4">
               <div className="relative">
                 <Image
                   src="/images/home_page/lab_image.png"
                   alt="Modern laboratory with advanced mushroom cultivation technology"
-                  className="rounded-xl shadow-2xl hover:shadow-3xl transition-shadow duration-300"
+                  className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
                   width={600}
                   height={400}
                 />

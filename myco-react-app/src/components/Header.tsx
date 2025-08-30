@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 function Header() {
   return (
-    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300">
+    <header className="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300">
       <nav className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
         {/* Logo */}
         <div className="flex items-center">
@@ -22,15 +22,14 @@ function Header() {
           <Link href="/" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
             Home
           </Link>
-          <Link href="/about" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
+          <Link href="/business/technology" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
             About Us
           </Link>
+          
           <Link href="/products" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
             Our Mushrooms
           </Link>
-          <Link href="/business/technology" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
-            Smart Farm
-          </Link>
+          
           <Link href="/shop" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
             Shop
           </Link>
