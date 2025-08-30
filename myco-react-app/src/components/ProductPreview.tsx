@@ -13,30 +13,47 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
   const { name, slug, images, availability } = product;
 
   return (
-    (<Link href={`/products/${slug?.current}`}>
-      <div className="border p-4 rounded-lg shadow-sm bg-white flex flex-col items-center text-center cursor-pointer hover:shadow-lg transition-shadow duration-200 h-full">
-        <div className="w-full h-48 bg-gray-200 rounded-md mb-4 overflow-hidden">
+    <Link href={`/products/${slug?.current}`}>
+      <div className="group bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col transform hover:scale-105">
+        <div className="relative w-full h-56 bg-gradient-to-br from-stone-100 to-stone-200 overflow-hidden">
           {images && images.length > 0 ? (
             <img
-              src={urlFor(images[0]).width(300).height(300).url() ?? ''}
+              src={urlFor(images[0]).width(400).height(400).url() ?? ''}
               alt={name ?? 'Product image'}
-              className="w-full h-full object-cover transition-transform duration-300 ease-in-out hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-500">No Image</div>
+            <div className="flex items-center justify-center h-full text-slate-400">
+              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </div>
 
-        <h3 className="text-lg font-semibold text-slate-800">{name}</h3>
-        
-        {availability && (
-            <p className={`text-sm mt-2 font-semibold ${availability === 'available' ? 'text-green-600' : 'text-red-600'}`}>
-                {availability.charAt(0).toUpperCase() + availability.slice(1)}
-            </p>
-        )}
-
+        <div className="p-6 flex-grow flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-teal-700 transition-colors duration-200">{name}</h3>
+          </div>
+          
+          <div className="flex items-center justify-between mt-4">
+            {availability && (
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  availability === 'available' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                    {availability.charAt(0).toUpperCase() + availability.slice(1)}
+                </span>
+            )}
+            <svg className="w-5 h-5 text-teal-600 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
       </div>
-    </Link>)
+    </Link>
   );
 };
 

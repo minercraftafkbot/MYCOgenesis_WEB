@@ -85,3 +85,25 @@ body {
 .hover\:scale-105:hover {
     transform: scale(1.05);
 }
+
+/* Additional utility classes */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Backdrop blur support for older browsers */
+@supports not (backdrop-filter: blur(12px)) {
+    .backdrop-blur-md {
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+    .backdrop-blur-sm {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+}
