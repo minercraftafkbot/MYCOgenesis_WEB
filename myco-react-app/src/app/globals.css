@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Hero section styles */
+.hero-bg {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+
+.hero-bg-image.active {
+    opacity: 1;
+}
+
+.hero-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    max-width: 100%;
+    padding: 0 0.5rem;
+}
+
+.hero-description {
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    line-height: 1.6;
+}
+
+/* Media Queries for Hero Section */
+@media (max-width: 640px) {
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 1.2;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+}
+
+/* Animation and transition styles */
+.transition-transform {
+    transition: transform 0.3s ease-in-out;
+}
+
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+
+/* Additional utility classes */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+
+/* Backdrop blur support for older browsers */
+@supports not (backdrop-filter: blur(12px)) {
+    .backdrop-blur-md {
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+    .backdrop-blur-sm {
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+}
+
+/* Text shadow utilities for better readability over images */
+.text-shadow {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-lg {
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+}
