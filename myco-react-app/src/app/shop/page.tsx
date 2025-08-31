@@ -29,12 +29,12 @@ export default async function ShopPage() {
     <div className="bg-white">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="text-center">
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
-                Our Products
-            </h1>
-            <p className="mt-4 text-xl text-gray-600">
-                From gourmet mushrooms to advanced cultivation kits, explore the world of mycology.
-            </p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">
+            Our Products
+          </h1>
+          <p className="mt-4 text-xl text-gray-600">
+            From gourmet mushrooms to advanced cultivation kits, explore the world of mycology.
+          </p>
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6">

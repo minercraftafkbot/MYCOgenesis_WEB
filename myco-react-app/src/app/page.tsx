@@ -176,11 +176,10 @@ export default function HomePage() {
                 <Image
                   src="/images/home_page/oyster_hand_holding_substrate.png"
                   alt="Hands holding mushroom substrate"
-                  className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+                  className="rounded-xl"
                   width={600}
                   height={400}
                 />
-                <div className="absolute inset-4 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
               </div>
             </div>
           </div>
@@ -239,7 +238,6 @@ export default function HomePage() {
                   width={600}
                   height={400}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-xl"></div>
               </div>
             </div>
           </div>
