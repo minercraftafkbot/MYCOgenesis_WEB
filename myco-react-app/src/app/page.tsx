@@ -176,7 +176,7 @@ export default function HomePage() {
                 <Image
                   src="/images/home_page/oyster_hand_holding_substrate.png"
                   alt="Hands holding mushroom substrate"
-                  className="rounded-xl"
+                  className="rounded-xl w-full h-auto"
                   width={600}
                   height={400}
                 />
