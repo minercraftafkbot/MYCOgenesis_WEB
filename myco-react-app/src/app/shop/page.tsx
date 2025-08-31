@@ -1,7 +1,7 @@
 
 // myco-react-app/src/app/shop/page.tsx
 import { sanityClient } from '../../lib/sanity';
-import { Product } from '../../types/sanity';
+import { Product } from '../../hooks/useProductCatalog';
 import ProductPreview from '../../components/ProductPreview';
 import { Metadata } from 'next';
 
@@ -12,11 +12,21 @@ export const metadata: Metadata = {
 
 async function getProducts(): Promise<Product[]> {
   const products = await sanityClient.fetch(
-    `*[_type == "product" && defined(slug.current)]{
+    `*[_type == "product" && defined(slug.current)] | order(sortOrder asc) {
       _id,
-      title,
+      name,
       slug,
-      defaultProductVariant
+      shortDescription,
+      images,
+      category->{
+        _ref,
+        _type,
+        name,
+        slug
+      },
+      availability,
+      isFeatured,
+      sortOrder
     }`
   );
   return products;
