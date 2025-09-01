@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "myco-react-app/out",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

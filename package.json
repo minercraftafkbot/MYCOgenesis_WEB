@@ -25,6 +25,7 @@
     "tailwindcss": "^4.1.12"
   },
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "@portabletext/react": "^4.0.2",
     "@sanity/image-url": "^1.2.0",
     "next-sanity": "^10.0.15"

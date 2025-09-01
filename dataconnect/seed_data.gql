@@ -1,0 +1,33 @@
+mutation SeedDatabase @auth(level: USER) {
+  category_upsertMany(data: [
+    { name: "Electronics", slug: "electronics", description: "Electronic gadgets and accessories" },
+    { name: "Books", slug: "books", description: "A wide variety of books" },
+    { name: "Home & Kitchen", slug: "home-and-kitchen", description: "Items for your home and kitchen" }
+  ])
+
+  product_upsertMany(data: [
+    { name: "Laptop", slug: "laptop", description: "High-performance laptop", price: 1200.00, stockQuantity: 50 },
+    { name: "Smartphone", slug: "smartphone", description: "Latest smartphone model", price: 800.00, stockQuantity: 100 },
+    { name: "The Great Gatsby", slug: "the-great-gatsby", description: "A classic novel", price: 10.00, stockQuantity: 200 }
+  ])
+
+  blogPost_upsertMany(data: [
+    { title: "First blog post", slug: "first-blog-post", content: "This is the first blog post", publishedAt: "2024-01-01T00:00:00Z", createdAt: "2024-01-01T00:00:00Z", updatedAt: "2024-01-01T00:00:00Z" },
+    { title: "Second blog post", slug: "second-blog-post", content: "This is the second blog post", publishedAt: "2024-01-02T00:00:00Z", createdAt: "2024-01-02T00:00:00Z", updatedAt: "2024-01-02T00:00:00Z" }
+  ])
+
+  subscriber_upsertMany(data: [
+    { email: "test1@example.com" },
+    { email: "test2@example.com" }
+  ])
+
+  order_upsertMany(data: [
+    { orderNumber: "12345", customerName: "John Doe", customerEmail: "john.doe@example.com", totalAmount: 150.00, orderStatus: "Shipped", shippingAddress: "123 Main St" },
+    { orderNumber: "67890", customerName: "Jane Smith", customerEmail: "jane.smith@example.com", totalAmount: 200.00, orderStatus: "Pending", shippingAddress: "456 Elm St" }
+  ])
+
+  orderItem_upsertMany(data: [
+    { quantity: 1, priceAtPurchase: 1200.00 },
+    { quantity: 2, priceAtPurchase: 800.00 }
+  ])
+}

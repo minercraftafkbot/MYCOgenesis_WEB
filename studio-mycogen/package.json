@@ -15,6 +15,7 @@
     "sanity"
   ],
   "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
     "@sanity/vision": "^4.6.0",
     "react": "^19.1",
     "react-dom": "^19.1",
