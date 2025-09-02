@@ -26,7 +26,7 @@ function Header() {
             About Us
           </Link>
           
-          <Link href="/products" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
+          <Link href="/our-mushrooms" className="text-slate-600 hover:text-teal-600 px-1 py-2 rounded-md text-sm font-medium hover:bg-teal-50/50 transition-all duration-200">
             Our Mushrooms
           </Link>
           
