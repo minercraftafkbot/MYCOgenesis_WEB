@@ -2,7 +2,6 @@
 import { sanityClient } from '../../lib/sanity';
 import { Post } from '../../types/sanity';
 import BlogPostPreview from '../../components/BlogPostPreview';
-import { isValidPostForPreview } from '../../utils/postUtils'; // Assuming you have a utility like this
 
 async function getPosts(): Promise<Post[]> {
     const posts = await sanityClient.fetch(
