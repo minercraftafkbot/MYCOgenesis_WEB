@@ -28,24 +28,15 @@ export interface SanityAuthor {
     _ref: string;
 }
 
-export interface ProductVariant {
-    _type: 'productVariant';
-    variantTitle?: string;
-    price?: number;
-    sku?: string;
-    images?: SanityImage[];
-}
-
 export interface Product {
     _id: string;
     _type: 'product';
-    title?: string;
+    name?: string;
     slug?: {
         current: string;
     };
+    shortDescription?: string,
     description?: BlockContent[]; // Sanity's block content
-    defaultProductVariant?: ProductVariant;
-    variants?: ProductVariant[];
     mainImage?: SanityImage;
     images?: SanityImage[];
     category?: {
@@ -58,7 +49,7 @@ export interface Product {
     };
     availability?: 'available' | 'out-of-stock' | 'seasonal' | 'discontinued';
     healthBenefits?: string[];
-    cookingTips?: string;
+    cookingTips?: BlockContent[];
     nutritionalInfo?: string;
     isFeatured?: boolean;
     sortOrder?: number;

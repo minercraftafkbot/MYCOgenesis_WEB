@@ -16,11 +16,14 @@ async function getProduct(slug: string): Promise<Product | null> {
   const product = await sanityClient.fetch(
     `*[_type == "product" && slug.current == $slug][0]{
       _id,
-      title,
+      name,
       slug,
       description,
-      defaultProductVariant,
-      "mainImage": defaultProductVariant.images[0]
+      "mainImage": images[0]{
+        asset->{
+          ...
+        }
+      }
     }`,
     { slug }
   );
@@ -31,8 +34,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     const { slug } = await params;
     const product = await getProduct(slug);
     return {
-        title: `${product?.title || 'Product'} | MYCOgenesis`,
-        description: `Details for ${product?.title || 'Product'}`
+        title: `${product?.name || 'Product'} | MYCOgenesis`,
+        description: `Details for ${product?.name || 'Product'}`
     }
 }
 
@@ -54,7 +57,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {product.mainImage && (
                  <Image
                     src={urlFor(product.mainImage).width(600).height(600).url()}
-                    alt={product.title || 'Product image'}
+                    alt={product.name || 'Product image'}
                     width={600}
                     height={600}
                     className="w-full h-auto object-cover rounded-lg shadow-md"
@@ -63,11 +66,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
 
           <div className="mt-8 md:mt-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">{product.title}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">{product.name}</h1>
             
+            {/* This part was referencing a price that is not in the schema, so it is commented out for now.
             {product.defaultProductVariant?.price && (
                 <p className="text-2xl text-gray-900 mt-2">${product.defaultProductVariant.price}</p>
             )}
+            */}
 
             <div className="mt-6 prose prose-lg text-gray-700">
                 {product.description && <PortableText value={product.description} />}

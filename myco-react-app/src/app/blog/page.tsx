@@ -1,27 +1,24 @@
 
-import { sanityClient } from '@/lib/sanity';
-import { Post } from '@/types/sanity';
-import BlogPostPreview from '@/components/BlogPostPreview';
-import { Metadata } from 'next';
+import { sanityClient } from '../../lib/sanity';
+import { Post } from '../../types/sanity';
+import BlogPostPreview from '../../components/BlogPostPreview';
+import { isValidPostForPreview } from '../../utils/postUtils'; // Assuming you have a utility like this
 
-export const metadata: Metadata = {
-    title: 'Blog | MYCOgenesis',
-    description: 'Explore the latest news, research, and insights from the world of mycology.',
-};
-
-// Re-using the Post interface from sanity.ts, assuming it fits the needs for blog listing.
 async function getPosts(): Promise<Post[]> {
-    const posts = await sanityClient.fetch(`*[_type == "post" && defined(slug.current)]|order(publishedAt desc){
-        _id, title, slug, publishedAt, excerpt
-    }`);
+    const posts = await sanityClient.fetch(
+        `*[_type == "post"] | order(publishedAt desc){
+            _id,
+            title,
+            slug,
+            publishedAt,
+            featuredImage,
+            excerpt,
+            author->{name, image},
+            "category": categories[0]->{title, slug}
+        }`
+    );
     return posts;
 }
-
-// Type guard to ensure post has all required fields for preview
-function isValidPostForPreview(post: Post): post is Post & { _id: string; title: string; slug: { current: string }; publishedAt: string } {
-    return !!(post._id && post.title && post.slug && post.slug.current && post.publishedAt);
-}
-
 
 export default async function BlogPage() {
     const posts = await getPosts();
@@ -36,8 +33,8 @@ export default async function BlogPage() {
                     </p>
                 </div>
 
-                <div className="mt-20 max-w-4xl mx-auto grid gap-8 lg:max-w-none">
-                    {posts.filter(isValidPostForPreview).map((post) => (
+                <div className="mt-20 grid gap-8 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 lg:max-w-none">
+                    {posts.map((post) => (
                         <BlogPostPreview key={post._id} post={post} />
                     ))}
                 </div>
