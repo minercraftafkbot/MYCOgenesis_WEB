@@ -33,7 +33,7 @@ export default function OurMushroomsPage() {
                             />
                         </div>
                         <div>
-                            <h2 className="text-3xl font-bold mb-3 text-slate-800">Button, Cremini & Portobello</h2>
+                            <h2 className="text-3xl font-bold mb-3 text-slate-800">Button, Cremini &amp; Portobello</h2>
                             <p className="text-slate-600 text-lg leading-relaxed mb-4">
                                 These are all the same mushroom (Agaricus bisporus) at different stages of maturity. From the mild, familiar white button to the slightly richer cremini and the large, meaty portobello, they are the versatile workhorses of the culinary world.
                             </p>
@@ -73,7 +73,7 @@ export default function OurMushroomsPage() {
                         <div>
                             <h2 className="text-3xl font-bold mb-3 text-slate-800">Lion&apos;s Mane</h2>
                             <p className="text-slate-600 text-lg leading-relaxed mb-4">
-                                With a unique, shaggy appearance resembling a lion's mane, this mushroom (Hericium erinaceus) is prized not only for its seafood-like flavor but also for its cognitive and neurological health benefits.
+                                With a unique, shaggy appearance resembling a lion&apos;s mane, this mushroom (Hericium erinaceus) is prized not only for its seafood-like flavor but also for its cognitive and neurological health benefits.
                             </p>
                         </div>
                     </div>
