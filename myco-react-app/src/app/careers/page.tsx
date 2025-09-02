@@ -25,7 +25,7 @@ export default async function CareersPage() {
                         Join Our Team
                     </h1>
                     <p className="mt-4 text-xl text-gray-600">
-                        We're looking for passionate individuals to join us on our mission.
+                        We&apos;re looking for passionate individuals to join us on our mission.
                     </p>
                 </div>
 

@@ -38,7 +38,7 @@ export default function TechnologyPage() {
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-800">Automated Environmental Controls</h2>
             <p className="mt-4 text-lg text-gray-700">
-              Our platform doesn't just monitor; it acts. Based on the insights from our analytics, the system automatically adjusts lighting, ventilation, and irrigation to maintain the perfect conditions for each specific mushroom strain. This level of automation reduces labor costs and minimizes the risk of human error.
+              Our platform doesn&apos;t just monitor; it acts. Based on the insights from our analytics, the system automatically adjusts lighting, ventilation, and irrigation to maintain the perfect conditions for each specific mushroom strain. This level of automation reduces labor costs and minimizes the risk of human error.
             </p>
           </div>
         </div>

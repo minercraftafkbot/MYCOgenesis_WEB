@@ -2,6 +2,7 @@
 // myco-react-app/src/components/ProductPreview.tsx
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Product } from '../hooks/useProductCatalog';
 import { urlFor } from '../lib/sanity';
 
@@ -17,9 +18,11 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
       <div className="group bg-white/80 backdrop-blur-sm border border-white/20 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col transform hover:scale-105">
         <div className="relative w-full h-56 bg-gradient-to-br from-stone-100 to-stone-200 overflow-hidden">
           {images && images.length > 0 ? (
-            <img
+            <Image
               src={urlFor(images[0]).width(400).height(400).url() ?? ''}
               alt={name ?? 'Product image'}
+              width={400}
+              height={400}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
           ) : (

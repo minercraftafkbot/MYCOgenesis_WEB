@@ -1,6 +1,6 @@
 
 import { sanityClient, urlFor } from '@/lib/sanity'; // Corrected import
-import { SingleBlogPost } from '@/types/sanity'; 
+import { Post, SanityImage } from '@/types/sanity'; 
 import { PortableText } from '@portabletext/react';
 import Image from 'next/image';
 import { Metadata, ResolvingMetadata } from 'next';
@@ -14,7 +14,7 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const post: SingleBlogPost = await sanityClient.fetch(
+  const post: Post = await sanityClient.fetch(
     `*[_type == "post" && slug.current == $slug][0]{
         title, excerpt, featuredImage
     }`,
@@ -34,7 +34,7 @@ export async function generateMetadata(
   };
 }
 
-async function getPost(slug: string): Promise<SingleBlogPost> {
+async function getPost(slug: string): Promise<Post> {
     const post = await sanityClient.fetch(
         `*[_type == "post" && slug.current == $slug][0]{
             _id, title, slug, publishedAt, body, featuredImage, excerpt,
@@ -49,7 +49,7 @@ async function getPost(slug: string): Promise<SingleBlogPost> {
 // Components for rendering Portable Text
 const ptComponents = {
     types: {
-        image: ({ value }: { value: any }) => {
+        image: ({ value }: { value: SanityImage }) => {
             if (!value?.asset?._ref) {
                 return null;
             }

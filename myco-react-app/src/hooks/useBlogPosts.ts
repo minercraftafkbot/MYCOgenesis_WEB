@@ -12,14 +12,13 @@ interface BlogPostsOptions {
     limit?: number;
 }
 
-
 export default function useBlogPosts(options: BlogPostsOptions = {}) {
   const { limit } = options;
   
   // Base query
   let query = `*[_type == "post" && defined(slug.current)]|order(publishedAt desc){\n    _id,\n    title,\n    slug,\n    publishedAt\n  }`;
 
-  const params: { [key: string]: any } = {};
+  const params: Record<string, unknown> = {};
 
   // Apply limit if provided
   if (limit) {
