@@ -3,12 +3,37 @@
 
 // Based on your Sanity schema
 
+export interface SanityImage {
+    _type: 'image';
+    asset: {
+        _ref: string;
+        _type: 'reference';
+    };
+    alt?: string;
+}
+
+export interface BlockContent {
+    _type: 'block';
+    children: {
+        _type: 'span';
+        text: string;
+        marks: string[];
+    }[];
+    markDefs: Record<string, unknown>[];
+    style: string;
+}
+
+export interface SanityAuthor {
+    _type: 'reference';
+    _ref: string;
+}
+
 export interface ProductVariant {
     _type: 'productVariant';
     variantTitle?: string;
     price?: number;
     sku?: string;
-    images?: any[];
+    images?: SanityImage[];
 }
 
 export interface Product {
@@ -18,36 +43,44 @@ export interface Product {
     slug?: {
         current: string;
     };
-    description?: any; // Sanity's block content
+    description?: BlockContent[]; // Sanity's block content
     defaultProductVariant?: ProductVariant;
     variants?: ProductVariant[];
-    mainImage?: any;
+    mainImage?: SanityImage;
+    images?: SanityImage[];
+    category?: {
+        _ref: string;
+        _type: string;
+        name: string;
+        slug: {
+            current: string;
+        };
+    };
+    availability?: 'available' | 'out-of-stock' | 'seasonal' | 'discontinued';
+    healthBenefits?: string[];
+    cookingTips?: string;
+    nutritionalInfo?: string;
+    isFeatured?: boolean;
+    sortOrder?: number;
+    seo?: {
+        metaTitle?: string;
+        metaDescription?: string;
+        keywords?: string[];
+    };
 }
 
 export interface Post {
     _id: string;
     _type: 'post';
-    title?: string;
-    slug?: {
-        current: string;
-    };
-    body?: any; // Sanity's block content
-    author?: any; // Reference to author
-    publishedAt?: string;
-    excerpt?: string;
-}
-
-export interface SingleBlogPost {
-    _id: string;
     title: string;
     slug: { current: string };
     publishedAt: string;
-    body: any; // Portable Text
-    featuredImage?: any; // Sanity Image
+    body: BlockContent[]; // Portable Text
+    featuredImage?: SanityImage; // Sanity Image
     excerpt?: string; // Add this line
     author: {
         name: string;
-        image?: any; // Sanity Image
+        image?: SanityImage; // Sanity Image
     };
     categories?: {
         _id: string;
@@ -62,7 +95,7 @@ export interface TeamMember {
     name?: string;
     role?: string;
     bio?: string;
-    image?: any;
+    image?: SanityImage;
     order?: number;
 }
 

@@ -5,21 +5,21 @@
 import Link from 'next/link';
 import { PortableText } from '@portabletext/react';
 import imageUrlBuilder from '@sanity/image-url';
-import { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import Image from 'next/image';
 
 import { sanityClient } from '../../../lib/sanity';
-import { SingleBlogPost } from '../../../types/sanity'; // Import the shared type
+import { Post, SanityImage } from '../../../types/sanity'; // Import the shared type
 
 // --- Image URL Builder ---
 const builder = imageUrlBuilder(sanityClient);
-function urlFor(source: SanityImageSource) {
+function urlFor(source: SanityImage) {
   return builder.image(source);
 }
 
 // --- Blog Post Page Component ---
 // This is now a simple presentational component that receives the post data as a prop.
 interface PostPageProps {
-  post: SingleBlogPost;
+  post: Post;
 }
 
 export default function PostPage({ post }: PostPageProps) {
@@ -35,9 +35,11 @@ export default function PostPage({ post }: PostPageProps) {
 
         {post.featuredImage && (
           <div className="mb-8">
-            <img
+            <Image
               src={urlFor(post.featuredImage).width(1200).url()}
               alt={post.title}
+              width={1200}
+              height={675}
               className="w-full h-auto rounded-lg shadow-lg"
             />
           </div>

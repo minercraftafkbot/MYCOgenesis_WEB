@@ -9,7 +9,7 @@ interface SanityData<T> {
 }
 
 // Simple in-memory cache (for basic caching)
-const cache = new Map<string, any>();
+const cache = new Map<string, unknown>();
 
 /**
  * Custom React hook to fetch data from Sanity using a GROQ query.
@@ -19,7 +19,7 @@ const cache = new Map<string, any>();
  * @param params - Optional parameters for the query.
  * @returns An object containing data, loading state, and error.
  */
-function useSanityData<T>(query: string, params: { [key: string]: any } = {}): SanityData<T> {
+function useSanityData<T>(query: string, params: Record<string, unknown> = {}): SanityData<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -34,7 +34,7 @@ function useSanityData<T>(query: string, params: { [key: string]: any } = {}): S
 
       // Check cache first
       if (cache.has(cacheKey)) {
-        setData(cache.get(cacheKey));
+        setData(cache.get(cacheKey) as T);
         setLoading(false);
         return;
       }
@@ -43,11 +43,14 @@ function useSanityData<T>(query: string, params: { [key: string]: any } = {}): S
         const result = await sanityClient.fetch<T>(query, params);
         setData(result);
         cache.set(cacheKey, result); // Store in cache
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error fetching data from Sanity:', err);
-        setError(err);
+        if (err instanceof Error) {
+            setError(err);
+        } else {
+            setError(new Error('An unknown error occurred'));
+        }
         setData(null); // Ensure data is null on error
-        // Optionally, show a user-friendly error message using a UI state manager hook
       } finally {
         setLoading(false);
       }
@@ -64,9 +67,7 @@ function useSanityData<T>(query: string, params: { [key: string]: any } = {}): S
 
     fetchData();
 
-    // No cleanup needed for this simple fetch hook
-
-  }, [query, JSON.stringify(params)]); // Re-run effect if query or params change
+  }, [query, params, cacheKey]); // Re-run effect if query or params change
 
   return { data, loading, error };
 }

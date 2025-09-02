@@ -1,5 +1,15 @@
 
 import useSanityData from './useSanityData';
+import { SanityImage } from '../types/sanity';
+
+export interface ProductCategory {
+    _ref: string;
+    _type: string;
+    name: string;
+    slug: {
+        current: string;
+    };
+}
 
 export interface Product {
   _id: string;
@@ -8,20 +18,11 @@ export interface Product {
     current: string;
   };
   shortDescription?: string;
-  images?: {
-    asset: {
-      _ref: string;
-      _type: string;
-    };
-  }[];
-  category?: {
-    _ref: string;
-    _type: string;
-  };
+  images?: SanityImage[];
+  category?: ProductCategory;
   availability?: 'available' | 'out-of-stock' | 'seasonal' | 'discontinued';
   isFeatured?: boolean;
   sortOrder?: number;
-  // Add other relevant product fields as needed
 }
 
 interface ProductCatalogOptions {
@@ -37,6 +38,7 @@ interface ProductCatalogData {
   error: Error | null;
 }
 
+
 /**
  * Custom React hook to fetch a list of products from Sanity.
  * Allows filtering by category and featured status.
@@ -48,7 +50,7 @@ export function useProductCatalog(options: ProductCatalogOptions = {}): ProductC
   const { category, isFeatured, limit, filterByAvailability } = options;
 
   let query = `*[_type == "product"`;
-  const params: { [key: string]: any } = {};
+  const params: Record<string, unknown> = {};
 
   if (category) {
     query += ` && category._ref in *[_type=="category" && slug.current == $category]._id`;
@@ -61,7 +63,7 @@ export function useProductCatalog(options: ProductCatalogOptions = {}): ProductC
   }
 
   if (filterByAvailability !== undefined) {
-    query += ` && availability == 'available'`;
+    query += ` && availability == \'available\'`;
   }
 
   query += `] | order(sortOrder asc) {

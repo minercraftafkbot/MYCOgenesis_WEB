@@ -12,7 +12,7 @@ export default function ContactPage() {
             <div className="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-800 sm:text-5xl">Contact Us</h1>
-                    <p className="mt-4 text-xl text-gray-600">We'd love to hear from you. Let's connect.</p>
+                    <p className="mt-4 text-xl text-gray-600">We&apos;d love to hear from you. Let&apos;s connect.</p>
                 </div>
 
                 <div className="mt-16 grid md:grid-cols-2 gap-16">
