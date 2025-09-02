@@ -7,9 +7,9 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 
 interface ProductPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 async function getProduct(slug: string): Promise<Product | null> {
@@ -28,7 +28,8 @@ async function getProduct(slug: string): Promise<Product | null> {
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-    const product = await getProduct(params.slug);
+    const { slug } = await params;
+    const product = await getProduct(slug);
     return {
         title: `${product?.title || 'Product'} | MYCOgenesis`,
         description: `Details for ${product?.title || 'Product'}`
@@ -37,7 +38,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const product = await getProduct(params.slug);
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     return <div>Product not found</div>;
